@@ -78,10 +78,10 @@
 		<Unit filename="src/engine/TGALoader.h" />
 		<Unit filename="src/engine/TextureLoader.cpp" />
 		<Unit filename="src/engine/TextureLoader.h" />
-		<Unit filename="src/engine/ui/Button.cpp" />
-		<Unit filename="src/engine/ui/Button.h" />
-		<Unit filename="src/engine/ui/Gui.cpp" />
-		<Unit filename="src/engine/ui/Gui.h" />
+		<Unit filename="src/engine/UI/Button.cpp" />
+		<Unit filename="src/engine/UI/Button.h" />
+		<Unit filename="src/engine/UI/Gui.cpp" />
+		<Unit filename="src/engine/UI/Gui.h" />
 		<Unit filename="src/game/ConvexHull.cpp" />
 		<Unit filename="src/game/ConvexHull.h" />
 		<Unit filename="src/game/Game.cpp" />
@@ -99,7 +99,9 @@
 		<Unit filename="src/game/Utility.h" />
 		<Unit filename="src/main.cpp" />
 		<Extensions>
-			<code_completion />
+			<code_completion>
+				<search_path add="C:\Users\user\Desktop\_Kirill\Git\TSpace\" />
+			</code_completion>
 			<envvars />
 			<debugger />
 			<lib_finder disable_auto="1" />

@@ -8,6 +8,30 @@ namespace graphics
         glLoadIdentity();
     }
 
+    void DrawTexture(vec2 position, float width, float height, GLuint texture, bool use_blend, color color_mask)
+    {
+        float X0 = position.a;
+        float Y0 = position.b;
+
+        if(use_blend)
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
+        glActiveTexture(GL_TEXTURE0);
+        glColor4f(float(color_mask.r) / 255, float(color_mask.g) / 255, float(color_mask.b) / 255, float(color_mask.a) / 100);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f(X0, Y0 + height, 0.0f);
+            glTexCoord2f(1, 0); glVertex3f(X0 + width, Y0 + height, 0.0f);
+            glTexCoord2f(1, 1); glVertex3f(X0 + width, Y0, 0.0f);
+            glTexCoord2f(0, 1); glVertex3f(X0, Y0, 0.0f);
+        glEnd();
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glColor4f(1, 1, 1, 1);
+        if(use_blend) glDisable(GL_BLEND);
+    }
+
     void DrawTexture(vec2 position, float width, float height, GLuint texture, bool use_blend)
     {
         float X0 = position.a;
@@ -79,12 +103,7 @@ namespace graphics
             freetype::ftchar *tempChar = new freetype::ftchar();
             ftlib.GetSymbol(text[i], tempChar, text_size);
 
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glColor4f(float(text_color.r) / 255, float(text_color.g) / 255, float(text_color.b) / 255, float(text_color.a) / 100);
-            DrawTexture(vec2(position.a + shift, position.b - tempChar->bearingY), tempChar->width, tempChar->height, tempChar->texture, false);
-            glColor4f(1, 1, 1, 1);
-            glDisable(GL_BLEND);
+            DrawTexture(vec2(position.a + shift, position.b - tempChar->bearingY), tempChar->width, tempChar->height, tempChar->texture, true, text_color);
 
             shift+=tempChar->advance;
 

@@ -25,7 +25,6 @@ class TPolygon
         void Rotate(float angle, float x0, float y0);
         void RotateBase(float angle, float x0, float y0);
 
-        string m_sprite_name;
         color m_color;
         Minkowski_Set m_vec_vertex_base;
         Minkowski_Set m_vec_vertex_out;

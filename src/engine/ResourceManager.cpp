@@ -15,8 +15,9 @@ void TResourceManager::Init(string path)
 
 void TResourceManager::LoadTextures()
 {
-    m_game_textures["ship"] = m_texture_loader.GetTexture(m_path + "\Textures\\ship.tga");
-    //m_game_textures.push_back(m_texture_loader.GetTexture(m_path + "\Textures\\ship.tga"));
+    m_game_textures["sprite_ship"] = m_texture_loader.GetTexture(m_path + "\\Res\\Textures\\ship.tga");
+    m_game_textures["sprite_bullet"] = m_texture_loader.GetTexture(m_path + "\\Res\\Textures\\bullet.tga");
+    m_game_textures["sprite_background"] = m_texture_loader.GetTexture(m_path + "\\Res\\Textures\\background.tga");
 }
 
 void TResourceManager::LoadSettings()

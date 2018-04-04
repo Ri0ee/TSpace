@@ -34,7 +34,6 @@ void TPolygon::addVertex(float x, float y)
 
 void TPolygon::Draw(float X0, float Y0)
 {
-    //graphics::DrawSprite(m_sprite_name, m_x, m_y, m_color, true);
     graphics::DrawPolygon(m_vec_vertex_out.m_vec_vertex, m_color, vec2(X0, Y0), false, 1);
 }
 

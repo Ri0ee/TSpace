@@ -15,7 +15,7 @@ using std::string;
 class TGameEntity
 {
     public:
-        TGameEntity(string entity_name, TPolygon polygon, vec2 origin, vec2 acceleration, string sprite_name);
+        TGameEntity(const string& entity_name, const string& sprite_name, TPolygon polygon, vec2 origin, vec2 acceleration, int life_time, int max_life_time);
         virtual ~TGameEntity();
 
         void AddShape(TPolygon polygon);
@@ -23,6 +23,7 @@ class TGameEntity
         void FindBoudaries();
 
         string m_name;
+        string m_sprite_name;
         float m_x;
         float m_y;
         float m_width;
@@ -31,5 +32,10 @@ class TGameEntity
         float m_velocity_x;
         float m_acceleration_y;
         float m_acceleration_x;
+        int m_life_time;
+        int m_max_life_time;
+
+        int m_shoot_delay;
+
         vector<TPolygon> m_vecPolygon;
 };

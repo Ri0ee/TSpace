@@ -62,15 +62,25 @@ TBasicShader BasicShader;
 TFrameBuffer fbo;
 TFrameBuffer fbo_msaa;
 
+float background_shift;
+
 ///BEGIN
 
 void GameplayRender()
 {
-    //for(unsigned int i = 0; i < Game.m_vecEntities.size(); i++)
-    //    Game.m_vecEntities[i].Draw();
+    graphics::DrawTexture(vec2(0 - background_shift, 0), window_width, window_height, resmngr.m_game_textures["sprite_background"], false);
+    graphics::DrawTexture(vec2(window_width - background_shift, 0), window_width, window_height, resmngr.m_game_textures["sprite_background"], false);
+    background_shift++;
+    if(background_shift == window_width)
+        background_shift = 0;
 
     for(unsigned int i = 0; i < Game.m_vecEntities.size(); i++)
-        graphics::DrawTexture(vec2(Game.m_vecEntities[i].m_x, Game.m_vecEntities[i].m_y), 100, 100, resmngr.m_game_textures["ship"], true);
+        graphics::DrawTexture(vec2(Game.m_vecEntities[i].m_x, Game.m_vecEntities[i].m_y),
+                              Game.m_vecEntities[i].m_width,
+                              Game.m_vecEntities[i].m_height,
+                              resmngr.m_game_textures[Game.m_vecEntities[i].m_sprite_name],
+                              true,
+                              Game.m_vecEntities[i].m_vecPolygon[0].m_color);
 
     color text_color{255, 255, 255, 100};
 
@@ -79,9 +89,7 @@ void GameplayRender()
     graphics::ftDrawText("depth: " + to_string(Game.m_collsion_depth), text_color, vec2(0, 32), 10, ftlib);
     graphics::ftDrawText("mouse pos: (" + to_string(mouse_pos.a) + ";" + to_string(mouse_pos.b) + ")", text_color, vec2(0, 44), 10, ftlib);
     graphics::ftDrawText("Entity_0 pos: (" + to_string(Game.m_vecEntities[0].m_x) + ";" + to_string(Game.m_vecEntities[0].m_y) + ")", text_color, vec2(0, 55), 10, ftlib);
-
-    //graphics::DrawTexture(vec2(100, 100), 100, 100, resmngr.m_game_textures["ship"], true);
-    //graphics::DrawSprite("ship", 200, 200, text_color, true);
+    graphics::ftDrawText("Entity count: " + to_string(Game.m_entity_count), text_color, vec2(0, 66), 10, ftlib);
 }
 
 void Render()
@@ -146,7 +154,7 @@ void button_1_callback()
 
 void InitGUI()
 {
-    ftlib.Init(ProgramPath, "Fontin-Regular.ttf");
+    ftlib.Init(ProgramPath, "Res\\Fontin-Regular.ttf");
 
     color btncolor{77, 0, 57, 50};
     color hl_btncolor{133, 51, 85, 50};
@@ -155,9 +163,9 @@ void InitGUI()
     vector<vec2> vertex;
     vertex.push_back(vec2(0, 0));    vertex.push_back(vec2(300, 0));
     vertex.push_back(vec2(300, 40)); vertex.push_back(vec2(50, 40));
-    TButton button_1(vertex, vec2(window_width - 300, 10), 1, btncolor, fg_btncolor, hl_btncolor, "left", &ftlib);
-    TButton button_2(vertex, vec2(window_width - 300, 80), 2, btncolor, fg_btncolor, hl_btncolor, "middle", &ftlib);
-    TButton button_3(vertex, vec2(window_width - 300, 150), 3, btncolor, fg_btncolor, hl_btncolor, "right", &ftlib);
+    TButton button_1(vertex, vec2(window_width - 300, 10), 2, btncolor, fg_btncolor, hl_btncolor, "Start", &ftlib);
+    TButton button_2(vertex, vec2(window_width - 300, 80), 2, btncolor, fg_btncolor, hl_btncolor, "Upgrade", &ftlib);
+    TButton button_3(vertex, vec2(window_width - 300, 150), 2, btncolor, fg_btncolor, hl_btncolor, "Exit", &ftlib);
     button_1.SetCallback(button_1_callback);
     guilib.AddButton(button_1);
     guilib.AddButton(button_2);
@@ -230,6 +238,8 @@ int main(int argc, char **argv)
         return -1;
     }
     glfwMakeContextCurrent(window);
+
+    Game.SetBorders(window_width, window_height);
 
     glewExperimental = GL_TRUE;
     glewInit();
