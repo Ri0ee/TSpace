@@ -31,6 +31,5 @@
 *.app
 
 # Special cases
-Textures/
 sprite_objects/
 *.layout
