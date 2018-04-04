@@ -58,6 +58,7 @@ bool keyDown[1000];
 TBlurShader BlurShader;
 TGlitchShader GlitchShader;
 TBasicShader BasicShader;
+TPostProcessingShader PPShader;
 
 TFrameBuffer fbo;
 TFrameBuffer fbo_msaa;
@@ -70,9 +71,19 @@ void GameplayRender()
 {
     graphics::DrawTexture(vec2(0 - background_shift, 0), window_width, window_height, resmngr.m_game_textures["sprite_background"], false);
     graphics::DrawTexture(vec2(window_width - background_shift, 0), window_width, window_height, resmngr.m_game_textures["sprite_background"], false);
+    Game.m_vecBorderMeshes[0].Draw(0 - background_shift, 0);
+    Game.m_vecBorderMeshes[1].Draw(window_width - background_shift, 0);
+    Game.m_vecBorderMeshes[2].Draw(0 - background_shift, window_height - 90);
+    Game.m_vecBorderMeshes[3].Draw(window_width - background_shift, window_height - 90);
     background_shift++;
     if(background_shift == window_width)
+    {
         background_shift = 0;
+        Game.m_vecBorderMeshes[0] = Game.m_vecBorderMeshes[1];
+        Game.m_vecBorderMeshes[1] = Game.GenerateBorderMesh(true);
+        Game.m_vecBorderMeshes[2] = Game.m_vecBorderMeshes[3];
+        Game.m_vecBorderMeshes[3] = Game.GenerateBorderMesh(false);
+    }
 
     for(unsigned int i = 0; i < Game.m_vecEntities.size(); i++)
         graphics::DrawTexture(vec2(Game.m_vecEntities[i].m_x, Game.m_vecEntities[i].m_y),
@@ -82,7 +93,7 @@ void GameplayRender()
                               true,
                               Game.m_vecEntities[i].m_vecPolygon[0].m_color);
 
-    color text_color{255, 255, 255, 100};
+    color text_color{0, 0, 0, 100};
 
     graphics::ftDrawText("fps: " + to_string(FPS), text_color, vec2(0, 10), 10, ftlib);
     graphics::ftDrawText((Game.m_collision_flag?"collision: yes":"collision: no"), text_color, vec2(0, 21), 10, ftlib);
@@ -145,6 +156,8 @@ void InitGL()
     cout << "Vendor: " << glGetString(GL_VENDOR) << "\n";
     cout << "Renderer: " << glGetString(GL_RENDERER) << "\n";
     cout << "Maximum MSAA Samples: " << max_msaa_samples << "\n";
+
+
 }
 
 void button_1_callback()
@@ -239,7 +252,7 @@ int main(int argc, char **argv)
     }
     glfwMakeContextCurrent(window);
 
-    Game.SetBorders(window_width, window_height);
+    Game.Init(window_width, window_height);
 
     glewExperimental = GL_TRUE;
     glewInit();

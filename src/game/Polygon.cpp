@@ -1,4 +1,5 @@
 #include "Polygon.h"
+#include <iostream>
 
 TPolygon::TPolygon()
 {
@@ -19,6 +20,16 @@ TPolygon::TPolygon(int r, int g, int b, int a)
 }
 
 TPolygon::~TPolygon() {}
+
+void TPolygon::PrintVerticesOut()
+{
+    std::cout << "printing polygon out: " << std::endl;
+    for(int i = 0; i < m_vec_vertex_out.m_vec_vertex.size(); i++)
+    {
+        std::cout << "(" << m_vec_vertex_out.m_vec_vertex[i].a << ";" << m_vec_vertex_out.m_vec_vertex[i].b << ")" << std::endl;
+    }
+    std::cout << "finished printing polygon out" << std::endl;
+}
 
 void TPolygon::addVertex(vec2 vertex)
 {

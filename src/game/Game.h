@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <iostream>
 #include <cmath>
 #include <algorithm>
 #include <iterator>
@@ -11,9 +10,13 @@
 #include "GameEntity.h"
 #include "Structures.h"
 #include "Utility.h"
+#include "ETime.h"
 
 #define DECIPATON 0.02
 #define BULLET_VELOCITY 5000
+#define BORDER_MESH_BOUND_Y 90
+#define MIN_BORDER_MESH_DEPTH 10
+#define BORDER_MESH_GENERATION_STEPS 10
 
 using std::vector;
 using std::set;
@@ -30,15 +33,17 @@ namespace game
 
             void Input(bool* keys);
             void Update(float delta_time);
-            void SetBorders(int window_width, int window_height);
+            void Init(int window_width, int window_height);
             void AddEntity(TGameEntity entity);
             void AddBullet();
             void ClearCollisions();
+            TPolygon GenerateBorderMesh(bool position_top);
             int FindForwardCollisionM(int eID1, int eID2, float deltaTime, float &penetrationDepth);
             TGameEntity& GetEntity(string entity_name);
 
             vector<TGameEntity> m_vecEntities;
             vector<collision> m_vecCollisions;
+            vector<TPolygon> m_vecBorderMeshes;
 
             bool m_msaa;
             bool m_collision_flag;

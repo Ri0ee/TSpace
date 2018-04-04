@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <iostream>
 
 namespace game
 {
@@ -9,6 +10,18 @@ namespace game
         m_collision_flag = false;
         m_collsion_depth = 0;
         m_entity_count = 0;
+        m_vecBorderMeshes.resize(4);
+    }
+
+    TGame::~TGame()
+    {
+
+    }
+
+    void TGame::Init(int window_width, int window_height)
+    {
+        m_window_width = window_width;
+        m_window_height = window_height;
 
         TPolygon Triangle(255, 255, 255, 100);
         Triangle.addVertex(0, 50);
@@ -24,14 +37,37 @@ namespace game
         bullet_shape.m_color.g = 0;
         bullet_shape.m_color.b = 0;
         bullet_shape.m_color.a = 100;
+
+        m_vecBorderMeshes[0] = GenerateBorderMesh(true);
+        m_vecBorderMeshes[1] = GenerateBorderMesh(true);
+        m_vecBorderMeshes[2] = GenerateBorderMesh(false);
+        m_vecBorderMeshes[3] = GenerateBorderMesh(false);
     }
 
-    TGame::~TGame(){}
-
-    void TGame::SetBorders(int window_width, int window_height)
+    TPolygon TGame::GenerateBorderMesh(bool position_top)
     {
-        m_window_width = window_width;
-        m_window_height = window_height;
+        TPolygon temp_polygon(255, 255, 255, 100);
+        srand(GetTime());
+        if(position_top)
+        {
+            temp_polygon.addVertex(0, BORDER_MESH_BOUND_Y);
+            temp_polygon.addVertex(0, 0);
+            temp_polygon.addVertex(m_window_width, 0);
+            temp_polygon.addVertex(m_window_width, BORDER_MESH_BOUND_Y);
+            for(int i = 0; i < BORDER_MESH_GENERATION_STEPS; i++)
+                temp_polygon.addVertex(m_window_width - ((m_window_width / BORDER_MESH_GENERATION_STEPS) * i), (rand() % BORDER_MESH_BOUND_Y) * 2);
+        }
+        else
+        {
+            temp_polygon.addVertex(0, 0);
+            temp_polygon.addVertex(0, BORDER_MESH_BOUND_Y);
+            temp_polygon.addVertex(m_window_width, BORDER_MESH_BOUND_Y);
+            temp_polygon.addVertex(m_window_width, 0);
+            for(int i = 0; i < BORDER_MESH_GENERATION_STEPS; i++)
+                temp_polygon.addVertex(m_window_width - ((m_window_width / BORDER_MESH_GENERATION_STEPS) * i), (rand() % BORDER_MESH_BOUND_Y) * 2);
+
+        }
+        return temp_polygon;
     }
 
     void TGame::AddEntity(TGameEntity entity)

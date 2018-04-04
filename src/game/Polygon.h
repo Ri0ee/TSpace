@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <string>
-#include <iostream>
 #include <math.h>
 #include <algorithm>
 
@@ -19,6 +18,7 @@ class TPolygon
         TPolygon(int r, int g, int b, int a);
         virtual ~TPolygon();
 
+        void PrintVerticesOut();
         void addVertex(vec2 vertex);
         void addVertex(float x, float y);
         void Draw(float x0, float y0);
