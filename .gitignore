@@ -23,7 +23,6 @@
 # Compiled Static libraries
 *.lai
 *.la
-*.a
 *.lib
 
 # Executables
@@ -34,3 +33,4 @@
 # Special cases
 Textures/
 sprite_objects/
+*.layout
