@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Special cases
+Textures/
+sprite_objects/

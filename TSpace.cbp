@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="TSpace" />
+		<Option platforms="Windows;" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/TSpace" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add directory="src/engine" />
+					<Add directory="src/game" />
+					<Add directory="src/engine/ui" />
+					<Add directory="incl" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/TSpace" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add directory="src/engine" />
+					<Add directory="src/game" />
+					<Add directory="src/engine/ui" />
+					<Add directory="incl" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-std=c++11" />
+			<Add directory="incl" />
+			<Add directory="lib" />
+		</Compiler>
+		<Linker>
+			<Add library="lib/libglew_static.a" />
+			<Add library="lib/libglfw3.a" />
+			<Add library="gdi32" />
+			<Add library="lib/libopengl32.a" />
+			<Add library="lib/libglu32.a" />
+			<Add library="lib/libfreetyped.a" />
+			<Add directory="incl" />
+			<Add directory="lib" />
+		</Linker>
+		<Unit filename="src/engine/BasicShader.cpp" />
+		<Unit filename="src/engine/BasicShader.h" />
+		<Unit filename="src/engine/BlurShader.cpp" />
+		<Unit filename="src/engine/BlurShader.h" />
+		<Unit filename="src/engine/ETime.cpp" />
+		<Unit filename="src/engine/ETime.h" />
+		<Unit filename="src/engine/FrameBuffer.cpp" />
+		<Unit filename="src/engine/FrameBuffer.h" />
+		<Unit filename="src/engine/FreeType.cpp" />
+		<Unit filename="src/engine/FreeType.h" />
+		<Unit filename="src/engine/GlitchShader.cpp" />
+		<Unit filename="src/engine/GlitchShader.h" />
+		<Unit filename="src/engine/Logger.cpp" />
+		<Unit filename="src/engine/Logger.h" />
+		<Unit filename="src/engine/Render.cpp" />
+		<Unit filename="src/engine/Render.h" />
+		<Unit filename="src/engine/ResourceManager.cpp" />
+		<Unit filename="src/engine/ResourceManager.h" />
+		<Unit filename="src/engine/ShaderLoader.cpp" />
+		<Unit filename="src/engine/ShaderLoader.h" />
+		<Unit filename="src/engine/TGALoader.cpp" />
+		<Unit filename="src/engine/TGALoader.h" />
+		<Unit filename="src/engine/TextureLoader.cpp" />
+		<Unit filename="src/engine/TextureLoader.h" />
+		<Unit filename="src/engine/ui/Button.cpp" />
+		<Unit filename="src/engine/ui/Button.h" />
+		<Unit filename="src/engine/ui/Gui.cpp" />
+		<Unit filename="src/engine/ui/Gui.h" />
+		<Unit filename="src/game/ConvexHull.cpp" />
+		<Unit filename="src/game/ConvexHull.h" />
+		<Unit filename="src/game/Game.cpp" />
+		<Unit filename="src/game/Game.h" />
+		<Unit filename="src/game/GameEntity.cpp" />
+		<Unit filename="src/game/GameEntity.h" />
+		<Unit filename="src/game/Minkowski.cpp" />
+		<Unit filename="src/game/Minkowski.h" />
+		<Unit filename="src/game/PointCollision.cpp" />
+		<Unit filename="src/game/PointCollision.h" />
+		<Unit filename="src/game/Polygon.cpp" />
+		<Unit filename="src/game/Polygon.h" />
+		<Unit filename="src/game/Structures.h" />
+		<Unit filename="src/game/Utility.cpp" />
+		<Unit filename="src/game/Utility.h" />
+		<Unit filename="src/main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<AutoVersioning>
+				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
+				<Settings autoincrement="1" date_declarations="1" use_define="0" update_manifest="1" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
+				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
+			</AutoVersioning>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
