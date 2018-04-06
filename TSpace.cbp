@@ -20,6 +20,7 @@
 					<Add directory="src/game" />
 					<Add directory="src/engine/ui" />
 					<Add directory="incl" />
+					<Add directory="src/engine/shaders" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -33,6 +34,7 @@
 					<Add directory="src/game" />
 					<Add directory="src/engine/ui" />
 					<Add directory="incl" />
+					<Add directory="src/engine/shaders" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -54,18 +56,12 @@
 			<Add directory="incl" />
 			<Add directory="lib" />
 		</Linker>
-		<Unit filename="src/engine/shaders/BasicShader.cpp" />
-		<Unit filename="src/engine/shaders/BasicShader.h" />
-		<Unit filename="src/engine/shaders/BlurShader.cpp" />
-		<Unit filename="src/engine/shaders/BlurShader.h" />
 		<Unit filename="src/engine/ETime.cpp" />
 		<Unit filename="src/engine/ETime.h" />
 		<Unit filename="src/engine/FrameBuffer.cpp" />
 		<Unit filename="src/engine/FrameBuffer.h" />
 		<Unit filename="src/engine/FreeType.cpp" />
 		<Unit filename="src/engine/FreeType.h" />
-		<Unit filename="src/engine/shaders/GlitchShader.cpp" />
-		<Unit filename="src/engine/shaders/GlitchShader.h" />
 		<Unit filename="src/engine/Logger.cpp" />
 		<Unit filename="src/engine/Logger.h" />
 		<Unit filename="src/engine/Render.cpp" />
@@ -78,6 +74,14 @@
 		<Unit filename="src/engine/TGALoader.h" />
 		<Unit filename="src/engine/TextureLoader.cpp" />
 		<Unit filename="src/engine/TextureLoader.h" />
+		<Unit filename="src/engine/shaders/BasicShader.cpp" />
+		<Unit filename="src/engine/shaders/BasicShader.h" />
+		<Unit filename="src/engine/shaders/BlurShader.cpp" />
+		<Unit filename="src/engine/shaders/BlurShader.h" />
+		<Unit filename="src/engine/shaders/GlitchShader.cpp" />
+		<Unit filename="src/engine/shaders/GlitchShader.h" />
+		<Unit filename="src/engine/shaders/PostProcessingShader.cpp" />
+		<Unit filename="src/engine/shaders/PostProcessingShader.h" />
 		<Unit filename="src/engine/ui/Button.cpp" />
 		<Unit filename="src/engine/ui/Button.h" />
 		<Unit filename="src/engine/ui/Gui.cpp" />

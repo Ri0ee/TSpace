@@ -76,6 +76,7 @@ namespace graphics
 
         if(draw_mode == BORDER)
         {
+            glLineWidth(2);
             for(unsigned int i = 0; i < shape.size() - 1; i++)
             {
                 glColor4f(float(shape_color.r) / 255, float(shape_color.g) / 255, float(shape_color.b) / 255, float(shape_color.a) / 100);

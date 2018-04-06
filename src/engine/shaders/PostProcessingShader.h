@@ -9,17 +9,21 @@
 
 using std::string;
 
-class PostProcessingShader
+class TPostProcessingShader
 {
     public:
-        PostProcessingShader();
-        PostProcessingShader(string directory, string file_name);
-        virtual ~PostProcessingShader();
+        TPostProcessingShader();
+        TPostProcessingShader(string directory, string file_name);
+        virtual ~TPostProcessingShader();
 
         void Create(string directory, string file_name);
-        void Activate();
+        void Activate(float res1, float res2, float time, bool vignette, float doublerating);
         void Deactivate();
 
     private:
         GLuint m_shader_program;
+        GLuint m_resolution_loc;
+        GLuint m_time_loc;
+        GLuint m_vignette_loc;
+        GLuint m_doublerating_loc;
 };

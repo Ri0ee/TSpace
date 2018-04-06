@@ -37,5 +37,7 @@ class TGameEntity
 
         int m_shoot_delay;
 
+        int m_shoot_timer;
+
         vector<TPolygon> m_vecPolygon;
 };

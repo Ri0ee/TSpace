@@ -28,4 +28,5 @@ class TPolygon
         color m_color;
         Minkowski_Set m_vec_vertex_base;
         Minkowski_Set m_vec_vertex_out;
+        bool m_is_changed;
 };

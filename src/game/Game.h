@@ -32,6 +32,7 @@ namespace game
             virtual ~TGame();
 
             void Input(bool* keys);
+            void EnemyAI();
             void Update(float delta_time);
             void Init(int window_width, int window_height);
             void AddEntity(TGameEntity entity);
@@ -53,6 +54,9 @@ namespace game
 
             int m_window_width;
             int m_window_height;
+
+            float m_border_top_last_connection_point;
+            float m_border_bottom_last_connection_point;
 
             TPolygon bullet_shape;
     };

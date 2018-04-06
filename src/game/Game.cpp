@@ -6,10 +6,12 @@ namespace game
     TGame::TGame()
     {
         m_vecCollisions.clear();
-        m_msaa = false;
+        m_msaa = true;
         m_collision_flag = false;
         m_collsion_depth = 0;
         m_entity_count = 0;
+        m_border_bottom_last_connection_point = 90;
+        m_border_top_last_connection_point = 90;
         m_vecBorderMeshes.resize(4);
     }
 
@@ -27,7 +29,14 @@ namespace game
         Triangle.addVertex(0, 50);
         Triangle.addVertex(50, 50);
         Triangle.addVertex(25, 0);
-        AddEntity(TGameEntity("Player", "sprite_ship", Triangle, vec2(10, 200), vec2(10, 10), -1, 0));
+        AddEntity(TGameEntity("Player", "sprite_ship", Triangle, vec2(10, window_height / 2 - 25), vec2(10, 10), -1, 0));
+
+        TPolygon Square(255, 0, 0, 100);
+        Square.addVertex(0, 50);
+        Square.addVertex(0, 0);
+        Square.addVertex(50, 0);
+        Square.addVertex(50, 50);
+        AddEntity(TGameEntity("Enemy", "sprite_enemy_1", Square, vec2(500, 200), vec2(10, 10), -1, 0));
 
         bullet_shape.addVertex(0, 5);
         bullet_shape.addVertex(0, 0);
@@ -50,21 +59,27 @@ namespace game
         srand(GetTime());
         if(position_top)
         {
+            float random_bind = rand() % BORDER_MESH_BOUND_Y + 40;
             temp_polygon.addVertex(0, BORDER_MESH_BOUND_Y);
             temp_polygon.addVertex(0, 0);
             temp_polygon.addVertex(m_window_width, 0);
             temp_polygon.addVertex(m_window_width, BORDER_MESH_BOUND_Y);
-            for(int i = 0; i < BORDER_MESH_GENERATION_STEPS; i++)
+            m_border_top_last_connection_point = random_bind;
+            srand(GetTime());
+            for(int i = 1; i < BORDER_MESH_GENERATION_STEPS; i++)
                 temp_polygon.addVertex(m_window_width - ((m_window_width / BORDER_MESH_GENERATION_STEPS) * i), (rand() % BORDER_MESH_BOUND_Y) * 2);
         }
         else
         {
+            float random_bind = rand() % BORDER_MESH_BOUND_Y + 40;
             temp_polygon.addVertex(0, 0);
             temp_polygon.addVertex(0, BORDER_MESH_BOUND_Y);
             temp_polygon.addVertex(m_window_width, BORDER_MESH_BOUND_Y);
             temp_polygon.addVertex(m_window_width, 0);
-            for(int i = 0; i < BORDER_MESH_GENERATION_STEPS; i++)
-                temp_polygon.addVertex(m_window_width - ((m_window_width / BORDER_MESH_GENERATION_STEPS) * i), (rand() % BORDER_MESH_BOUND_Y) * 2);
+            m_border_bottom_last_connection_point = random_bind;
+            srand(GetTime() / 2);
+            for(int i = 1; i < BORDER_MESH_GENERATION_STEPS; i++)
+                temp_polygon.addVertex(m_window_width - ((m_window_width / BORDER_MESH_GENERATION_STEPS) * i), (rand() % BORDER_MESH_BOUND_Y) * 2 - BORDER_MESH_BOUND_Y);
 
         }
         return temp_polygon;
@@ -117,8 +132,8 @@ namespace game
 
     void TGame::AddBullet()
     {
-        TGameEntity bullet("Bullet", "sprite_bullet", bullet_shape, vec2(m_vecEntities[0].m_x, m_vecEntities[0].m_y), vec2(0, 0), 0, 100);
-        TGameEntity bullet2("Bullet", "sprite_bullet", bullet_shape, vec2(m_vecEntities[0].m_x, m_vecEntities[0].m_y + m_vecEntities[0].m_height-5), vec2(0, 0), 0, 100);
+        TGameEntity bullet("Bullet", "sprite_bullet", bullet_shape, vec2(m_vecEntities[0].m_x + 51, m_vecEntities[0].m_y), vec2(0, 0), 0, 100);
+        TGameEntity bullet2("Bullet", "sprite_bullet", bullet_shape, vec2(m_vecEntities[0].m_x + 51, m_vecEntities[0].m_y + m_vecEntities[0].m_height-5), vec2(0, 0), 0, 100);
         bullet.m_velocity_x = BULLET_VELOCITY;
         bullet2.m_velocity_x = BULLET_VELOCITY;
         AddEntity(bullet);
@@ -169,12 +184,31 @@ namespace game
             }
     }
 
+    void TGame::EnemyAI()
+    {
+        for(auto it = m_vecEntities.begin(); it != m_vecEntities.end(); it++)
+        {
+            if(it->m_name == "Enemy")
+            {
+                it->m_shoot_timer++;
+                if(it->m_shoot_timer > 100)
+                {
+                    //AddBullet();
+                    it->m_shoot_timer = 0;
+                }
+            }
+
+        }
+    }
+
     void TGame::Update(float delta_time)
     {
         m_collision_flag = false;
         m_collsion_depth = 0;
         m_vecCollisions.clear();
         m_sleep_time++;
+
+        EnemyAI();
 
         for(auto it = m_vecEntities.begin(); it != m_vecEntities.end(); it++)
         {
@@ -201,6 +235,18 @@ namespace game
         {
             m_vecEntities[0].m_y = m_window_height - m_vecEntities[0].m_height - 1;
             m_vecEntities[0].m_velocity_y = 0;
+        }
+
+        if(m_vecEntities[0].m_x < 0)
+        {
+            m_vecEntities[0].m_x = 1;
+            m_vecEntities[0].m_velocity_x = 0;
+        }
+
+        if(m_vecEntities[0].m_x + m_vecEntities[0].m_width > m_window_width)
+        {
+            m_vecEntities[0].m_x = m_window_width - m_vecEntities[0].m_width;
+            m_vecEntities[0].m_velocity_x = 0;
         }
 
 

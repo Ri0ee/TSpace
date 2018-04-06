@@ -23,12 +23,10 @@ TPolygon::~TPolygon() {}
 
 void TPolygon::PrintVerticesOut()
 {
-    std::cout << "printing polygon out: " << std::endl;
+    std::cout << "Printing polygon out: " << std::endl;
     for(int i = 0; i < m_vec_vertex_out.m_vec_vertex.size(); i++)
-    {
         std::cout << "(" << m_vec_vertex_out.m_vec_vertex[i].a << ";" << m_vec_vertex_out.m_vec_vertex[i].b << ")" << std::endl;
-    }
-    std::cout << "finished printing polygon out" << std::endl;
+    std::cout << "Finished printing polygon out." << std::endl;
 }
 
 void TPolygon::addVertex(vec2 vertex)
@@ -45,7 +43,7 @@ void TPolygon::addVertex(float x, float y)
 
 void TPolygon::Draw(float X0, float Y0)
 {
-    graphics::DrawPolygon(m_vec_vertex_out.m_vec_vertex, m_color, vec2(X0, Y0), false, 1);
+    graphics::DrawPolygon(m_vec_vertex_out.m_vec_vertex, m_color, vec2(X0, Y0), false, 2);
 }
 
 void TPolygon::RotateBase(float angle, float X0, float Y0)

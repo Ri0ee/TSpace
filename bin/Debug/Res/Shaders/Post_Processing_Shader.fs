@@ -28,9 +28,9 @@ void main(void)
 	
     col *= vec3(0.8,1.0,0.7);
 
-    col *= 0.9+0.1*sin(7.0*time+pos.y*700.0);              
+    //col *= 0.9+0.1*sin(7.0*time+pos.y*700.0);              
 
-    //col *= 0.97+0.03*sin(210.0*time);
+    col *= 0.97+0.03*sin(210.0*time);
 	
     gl_FragColor = vec4(col, a);
 }

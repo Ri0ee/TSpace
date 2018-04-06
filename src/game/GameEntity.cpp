@@ -14,6 +14,7 @@ TGameEntity::TGameEntity(const string& entity_name, const string& sprite_name, T
     m_acceleration_y = acceleration.b;
     m_life_time = life_time;
     m_max_life_time = max_life_time;
+    m_shoot_timer = 0;
 
     FindBoudaries();
     m_vecPolygon[0].Rotate(M_PI_2, m_width, m_height);
