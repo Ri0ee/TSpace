@@ -34,9 +34,11 @@ class TGameEntity
         float m_acceleration_x;
         int m_life_time;
         int m_max_life_time;
+        bool m_static_speed;
 
+        int m_maximum_life;
+        int m_current_life;
         int m_shoot_delay;
-
         int m_shoot_timer;
 
         vector<TPolygon> m_vecPolygon;

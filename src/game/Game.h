@@ -19,12 +19,26 @@
 #define BORDER_MESH_GENERATION_STEPS 10
 
 using std::vector;
-using std::set;
 using std::string;
 using std::cout;
 
 namespace game
 {
+    struct collision
+    {
+        public:
+            int eID_1, eID_2;
+            float ePenetrationDepth;
+
+            collision();
+            collision(int in1, int in2, float in3)
+            {
+                eID_1 = in1;
+                eID_2 = in2;
+                ePenetrationDepth = in3;
+            }
+    };
+
     class TGame
     {
         public:
@@ -39,7 +53,8 @@ namespace game
             void AddBullet();
             void ClearCollisions();
             TPolygon GenerateBorderMesh(bool position_top);
-            int FindForwardCollisionM(int eID1, int eID2, float deltaTime, float &penetrationDepth);
+            bool FindForwardCollision(int entity_1, int entity_2, float deltaTime, float &penetrationDepth);
+            bool FindBorderCollision(int border, float deltaTime, float &penetrationDepth);
             TGameEntity& GetEntity(string entity_name);
 
             vector<TGameEntity> m_vecEntities;

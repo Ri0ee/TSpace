@@ -73,18 +73,3 @@ struct line
         }
 };
 
-struct collision
-{
-    public:
-        int eID_1, eID_2;
-        float ePenetrationDepth;
-
-        collision();
-        collision(int in1, int in2, float in3)
-        {
-            eID_1 = in1;
-            eID_2 = in2;
-            ePenetrationDepth = in3;
-        }
-};
-

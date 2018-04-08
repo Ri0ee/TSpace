@@ -99,10 +99,10 @@ namespace game
         return m_vecEntities[0];
     }
 
-    int TGame::FindForwardCollisionM(int eID1, int eID2, float deltaTime, float &penetrationDepth)
+    bool TGame::FindForwardCollision(int entity_1, int entity_2, float deltaTime, float &penetrationDepth)
     {
-        TGameEntity e1 = m_vecEntities[eID1];
-        TGameEntity e2 = m_vecEntities[eID2];
+        TGameEntity e1 = m_vecEntities[entity_1];
+        TGameEntity e2 = m_vecEntities[entity_2];
 
         TPolygon tempE1 = e1.m_vecPolygon[0];
         TPolygon tempE2 = e2.m_vecPolygon[0];
@@ -113,16 +113,35 @@ namespace game
         float e2_X0_t = e2.m_x + e2.m_velocity_x * deltaTime;
         float e2_Y0_t = e2.m_y + e2.m_velocity_y * deltaTime;
 
-        for(unsigned int i = 0; i < tempE1.m_vec_vertex_out.m_vec_vertex.size(); i++)
+        for(auto it = tempE1.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE1.m_vec_vertex_out.m_vec_vertex.end(); it++)
         {
-            tempE1.m_vec_vertex_out.m_vec_vertex[i].a += X0_t;
-            tempE1.m_vec_vertex_out.m_vec_vertex[i].b += Y0_t;
+            it->a += X0_t;
+            it->b += Y0_t;
         }
 
-        for(unsigned int i = 0; i < tempE2.m_vec_vertex_out.m_vec_vertex.size(); i++)
+        for(auto it = tempE2.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE2.m_vec_vertex_out.m_vec_vertex.end(); it++)
         {
-            tempE2.m_vec_vertex_out.m_vec_vertex[i].a += e2_X0_t;
-            tempE2.m_vec_vertex_out.m_vec_vertex[i].b += e2_Y0_t;
+            it->a += e2_X0_t;
+            it->b += e2_Y0_t;
+        }
+
+        bool ans = tempE1.m_vec_vertex_out.Intersect(tempE2.m_vec_vertex_out);
+        if(ans) penetrationDepth = tempE1.m_vec_vertex_out.m_nearest_point_length;
+        return ans;
+    }
+
+    bool TGame::FindBorderCollision(int border, float deltaTime, float &penetrationDepth)
+    {
+        TPolygon tempE1 = m_vecBorderMeshes[border]; ///Border mesh
+        TPolygon tempE2 = m_vecEntities[0].m_vecPolygon[0]; /// Player mesh
+
+        float X0_t = m_vecEntities[0].m_x + m_vecEntities[0].m_velocity_x * deltaTime;
+        float Y0_t = m_vecEntities[0].m_y + m_vecEntities[0].m_velocity_y * deltaTime;
+
+        for(auto it = tempE1.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE1.m_vec_vertex_out.m_vec_vertex.end(); it++)
+        {
+            it->a += X0_t;
+            it->b += Y0_t;
         }
 
         bool ans = tempE1.m_vec_vertex_out.Intersect(tempE2.m_vec_vertex_out);
@@ -249,21 +268,38 @@ namespace game
             m_vecEntities[0].m_velocity_x = 0;
         }
 
+        for(int i = 0; i < 4; i++)
+        {
+            float penetration_depth = 0;
+            if(FindBorderCollision(i, delta_time, penetration_depth))
+            {
+                collision temp_collision(0, 666+i, penetration_depth);
+                m_vecCollisions.push_back(temp_collision);
+                m_collision_flag = true;
+                m_collsion_depth = penetration_depth;
+            }
+        }
 
         ///Looking for Collision
         for(unsigned int i = 0; i < m_vecEntities.size(); i++)
         {
             for(unsigned int j = i + 1; j < m_vecEntities.size(); j++)
             {
-                float tempPenetrationDepth = 0;
-                if(FindForwardCollisionM(i, j, delta_time, tempPenetrationDepth))
+                float penetration_depth = 0;
+                if(FindForwardCollision(i, j, delta_time, penetration_depth))
                 {
-                    collision tempCollision(i, j, tempPenetrationDepth);
-                    m_vecCollisions.push_back(tempCollision);
+                    collision temp_collision(i, j, penetration_depth);
+                    m_vecCollisions.push_back(temp_collision);
                     m_collision_flag = true;
-                    m_collsion_depth = tempPenetrationDepth;
+                    m_collsion_depth = penetration_depth;
                 }
             }
+        }
+
+        ///Collision processing
+        for(auto it = m_vecCollisions.begin(); it != m_vecCollisions.end(); it++)
+        {
+            if(it->id_1)
         }
 
         ///Position Processing
