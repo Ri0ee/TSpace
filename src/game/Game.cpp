@@ -292,14 +292,28 @@ namespace game
                     m_vecCollisions.push_back(temp_collision);
                     m_collision_flag = true;
                     m_collsion_depth = penetration_depth;
+                    std::cout << "collided" << std::endl;
                 }
             }
         }
 
-        ///Collision processing
+        ///Collision Processing (Borders)
         for(auto it = m_vecCollisions.begin(); it != m_vecCollisions.end(); it++)
         {
-            if(it->id_1)
+           if((it->eID_1 == 0) && (it->eID_2 >= 666))
+           {
+               m_vecEntities[0].m_y = m_window_height / 2;
+               m_vecEntities[0].m_x = 1;
+           }
+        }
+
+        ///Collision processing (entities)
+        for(auto it = m_vecCollisions.begin(); it != m_vecCollisions.end(); it++)
+        {
+            if(it->eID_2 < 666 || it->eID_1 < 666)
+            {
+                //de something
+            }
         }
 
         ///Position Processing
