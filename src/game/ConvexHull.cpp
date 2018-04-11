@@ -77,7 +77,7 @@ bool compare(vec2 p1, vec2 p2)
 
 std::vector<vec2> Convex(std::vector<vec2> vecIn)
 {
-    if(vecIn.size() >= 3)
+    if(vecIn.size() > 3)
     {
         ///Bottom most point
         float minY = vecIn[0].b;
@@ -118,7 +118,7 @@ std::vector<vec2> Convex(std::vector<vec2> vecIn)
             }
         }
 
-        ///Build Convex Hull
+		///Build convex hull
         std::stack<vec2> S;
         S.push(vecIn[0]);
         S.push(vecIn[1]);
