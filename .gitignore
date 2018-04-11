@@ -33,3 +33,4 @@
 # Special cases
 sprite_objects/
 *.layout
+*.depend

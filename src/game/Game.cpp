@@ -99,19 +99,16 @@ namespace game
         return m_vecEntities[0];
     }
 
-    bool TGame::FindForwardCollision(int entity_1, int entity_2, float deltaTime, float &penetrationDepth)
+    bool TGame::FindForwardCollision(int entity_1, int entity_2, float deltaTime, float &penetration_depth)
     {
-        TGameEntity e1 = m_vecEntities[entity_1];
-        TGameEntity e2 = m_vecEntities[entity_2];
+        TPolygon tempE1 = m_vecEntities[entity_1].m_vecPolygon[0]; //First entity
+        TPolygon tempE2 = m_vecEntities[entity_2].m_vecPolygon[0]; //Second entity
 
-        TPolygon tempE1 = e1.m_vecPolygon[0];
-        TPolygon tempE2 = e2.m_vecPolygon[0];
+        float X0_t = m_vecEntities[entity_1].m_x + m_vecEntities[entity_1].m_velocity_x * deltaTime;
+        float Y0_t = m_vecEntities[entity_1].m_y + m_vecEntities[entity_1].m_velocity_y * deltaTime;
 
-        float X0_t = e1.m_x + e1.m_velocity_x * deltaTime;
-        float Y0_t = e1.m_y + e1.m_velocity_y * deltaTime;
-
-        float e2_X0_t = e2.m_x + e2.m_velocity_x * deltaTime;
-        float e2_Y0_t = e2.m_y + e2.m_velocity_y * deltaTime;
+        float e2_X0_t = m_vecEntities[entity_2].m_x + m_vecEntities[entity_2].m_velocity_x * deltaTime;
+        float e2_Y0_t = m_vecEntities[entity_2].m_y + m_vecEntities[entity_2].m_velocity_y * deltaTime;
 
         for(auto it = tempE1.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE1.m_vec_vertex_out.m_vec_vertex.end(); it++)
         {
@@ -125,15 +122,14 @@ namespace game
             it->b += e2_Y0_t;
         }
 
-        bool ans = tempE1.m_vec_vertex_out.Intersect(tempE2.m_vec_vertex_out);
-        if(ans) penetrationDepth = tempE1.m_vec_vertex_out.m_nearest_point_length;
-        return ans;
+        return tempE1.FindForwardCollsion(tempE2, penetration_depth);
     }
 
-    bool TGame::FindBorderCollision(int border, float deltaTime, float &penetrationDepth)
+    bool TGame::FindBorderCollision(int border, float deltaTime, float &penetration_depth)
     {
-        TPolygon tempE1 = m_vecBorderMeshes[border]; ///Border mesh
-        TPolygon tempE2 = m_vecEntities[0].m_vecPolygon[0]; /// Player mesh
+        std::cout << "Looking for collision with border n = " << border << std::endl;
+        TPolygon tempE1 = m_vecEntities[0].m_vecPolygon[0]; //Player
+        TPolygon tempE2 = m_vecBorderMeshes[border]; //Border
 
         float X0_t = m_vecEntities[0].m_x + m_vecEntities[0].m_velocity_x * deltaTime;
         float Y0_t = m_vecEntities[0].m_y + m_vecEntities[0].m_velocity_y * deltaTime;
@@ -144,9 +140,7 @@ namespace game
             it->b += Y0_t;
         }
 
-        bool ans = tempE1.m_vec_vertex_out.Intersect(tempE2.m_vec_vertex_out);
-        if(ans) penetrationDepth = tempE1.m_vec_vertex_out.m_nearest_point_length;
-        return ans;
+        return tempE1.FindForwardCollsion(tempE2, penetration_depth);
     }
 
     void TGame::AddBullet()

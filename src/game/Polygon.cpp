@@ -45,7 +45,27 @@ void TPolygon::Draw(float X0, float Y0)
 {
     ///Make triangulation here
     TPPLPartition pp;
-    graphics::DrawPolygon(m_vec_vertex_out.m_vec_vertex, m_color, vec2(X0, Y0), false, 2);
+    TPPLPoly temp_polygon;
+    temp_polygon.Init(m_vec_vertex_out.m_vec_vertex.size());
+
+    for(int i = 0; i < m_vec_vertex_out.m_vec_vertex.size(); i++)
+    {
+        temp_polygon[i].x = m_vec_vertex_out.m_vec_vertex[i].a;
+        temp_polygon[i].y = m_vec_vertex_out.m_vec_vertex[i].b;
+    }
+
+    std::list<TPPLPoly> result;
+    pp.ConvexPartition_HM(&temp_polygon, &result);
+
+    for(auto it = result.begin(); it != result.end(); it++)
+    {
+        std::vector<vec2> temp_vector(it->GetNumPoints());
+        for(int i = 0; i < it->GetNumPoints(); i++)
+        {
+            temp_vector.push_back(vec2(it->GetPoint(i).x, it->GetPoint(i).y));
+        }
+        graphics::DrawPolygon(temp_vector, m_color, vec2(X0, Y0), false, 2);
+    }
 }
 
 void TPolygon::RotateBase(float angle, float X0, float Y0)
@@ -80,7 +100,7 @@ void TPolygon::Rotate(float angle, float X0, float Y0)
     }
 }
 
-bool TPolygon::FindForwardCollsion(TPolygon second_polygon, float delta_time, float& penetration_depth)
+bool TPolygon::FindForwardCollsion(TPolygon second_polygon, float& penetration_depth)
 {
     TPPLPartition pp;
 
@@ -99,11 +119,16 @@ bool TPolygon::FindForwardCollsion(TPolygon second_polygon, float delta_time, fl
     float temp_penetration_depth = 0;
     for(auto it = result.begin(); it != result.end(); it++)
     {
-        std::vector<vec2> temp_vec2_vector;
-        int num_points = sizeof(it->GetPoints()) / sizeof(TPPLPoint);
-        for(int i = 0; i < num_points; i++)
+        Minkowski_Set temp_m_set;
+        int num_points = it->GetNumPoints();
+        for(long i = 0; i < num_points; i++)
+            temp_m_set.m_vec_vertex.push_back(vec2(it->GetPoint(i).x, it->GetPoint(i).y));
+
+        temp_collision_state = m_vec_vertex_out.Intersect(temp_m_set);
+        if(temp_collision_state)
         {
-            temp_vec2_vector.push_back(vec2(it->GetPoint(i).x, it->GetPoint(i).y));
+            temp_penetration_depth = temp_m_set.m_nearest_point_length;
+            break;
         }
     }
 

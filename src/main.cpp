@@ -28,19 +28,19 @@ using std::cin;
 using std::string;
 using std::vector;
 
-float FPS_LIMIT       = 150.0;
-int frameCount        = 0;
-float FPS             = 0;
+float FPS_LIMIT         = 150.0;
+int frameCount          = 0;
+float FPS               = 0;
 
-float unprocessedTime = 0.0;
-float frameCounter    = 0.0;
-float frameTime       = 1.0/FPS_LIMIT;
-float deltaTime       = 1.0/150.0;
+float unprocessedTime   = 0.0;
+float frameCounter      = 0.0;
+float frameTime         = 1.0/FPS_LIMIT;
+float deltaTime         = 1.0/150.0;
 
-int window_width       = 1280;
-int window_height      = 720;
-int max_msaa_samples   = 0;
-const char* window_name= "OpenGLEngine";
+int window_width        = 800;
+int window_height       = 640;
+int max_msaa_samples    = 0;
+const char* window_name = "OpenGLEngine";
 
 vec2 mouse_pos;
 

@@ -27,7 +27,7 @@ class TPolygon
         void Rotate(float angle, float x0, float y0);
         void RotateBase(float angle, float x0, float y0);
 
-        bool FindForwardCollsion(TPolygon second_polygon, float deltaTime, float &penetrationDepth);
+        bool FindForwardCollsion(TPolygon second_polygon, float &penetrationDepth);
 
         color m_color;
         Minkowski_Set m_vec_vertex_base;
