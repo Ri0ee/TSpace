@@ -44,6 +44,7 @@ void TPolygon::addVertex(float x, float y)
 void TPolygon::Draw(float X0, float Y0)
 {
     ///Make triangulation here
+    TPPLPartition pp;
     graphics::DrawPolygon(m_vec_vertex_out.m_vec_vertex, m_color, vec2(X0, Y0), false, 2);
 }
 
@@ -98,9 +99,12 @@ bool TPolygon::FindForwardCollsion(TPolygon second_polygon, float delta_time, fl
     float temp_penetration_depth = 0;
     for(auto it = result.begin(); it != result.end(); it++)
     {
-        //TPPLPoint* points[];
-        //points = it->GetPoints();
-        std::vector<vec2> temp_vec2_vector();
+        std::vector<vec2> temp_vec2_vector;
+        int num_points = sizeof(it->GetPoints()) / sizeof(TPPLPoint);
+        for(int i = 0; i < num_points; i++)
+        {
+            temp_vec2_vector.push_back(vec2(it->GetPoint(i).x, it->GetPoint(i).y));
+        }
     }
 
     penetration_depth = temp_penetration_depth;
