@@ -61,6 +61,8 @@ namespace game
             vector<collision> m_vecCollisions;
             vector<TPolygon> m_vecBorderMeshes;
 
+            TPolygon m_test_poly;
+
             bool m_msaa;
             bool m_collision_flag;
             float m_collsion_depth;

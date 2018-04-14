@@ -37,8 +37,8 @@ float frameCounter      = 0.0;
 float frameTime         = 1.0/FPS_LIMIT;
 float deltaTime         = 1.0/150.0;
 
-int window_width        = 800;
-int window_height       = 640;
+int window_width        = 1280;
+int window_height       = 720;
 int max_msaa_samples    = 0;
 const char* window_name = "OpenGLEngine";
 
@@ -72,10 +72,11 @@ void GameplayRender()
 {
     graphics::DrawTexture(vec2(0 - background_shift, 0), window_width, window_height, resmngr.m_game_textures["sprite_background"], false);
     graphics::DrawTexture(vec2(window_width - background_shift, 0), window_width, window_height, resmngr.m_game_textures["sprite_background"], false);
-    Game.m_vecBorderMeshes[0].Draw(0 - background_shift, 0);
-    Game.m_vecBorderMeshes[1].Draw(window_width - background_shift, 0);
-    Game.m_vecBorderMeshes[2].Draw(0 - background_shift, window_height - BORDER_MESH_BOUND_Y);
-    Game.m_vecBorderMeshes[3].Draw(window_width - background_shift, window_height - BORDER_MESH_BOUND_Y);
+    //Game.m_vecBorderMeshes[0].Draw(0 - background_shift, 0);
+    //Game.m_vecBorderMeshes[1].Draw(window_width - background_shift, 0);
+    //Game.m_vecBorderMeshes[2].Draw(0 - background_shift, window_height - BORDER_MESH_BOUND_Y);
+    //Game.m_vecBorderMeshes[3].Draw(window_width - background_shift, window_height - BORDER_MESH_BOUND_Y);
+    Game.m_test_poly.Draw(500, 50);
     background_shift++;
     if(background_shift == window_width)
     {
@@ -119,9 +120,9 @@ void Render()
     }
 
     graphics::Clear();
-    resmngr.m_post_processing_shader.Activate(window_width, window_height, GetTime() / 1000, true, 0.003);
+    //resmngr.m_post_processing_shader.Activate(window_width, window_height, GetTime() / 1000, true, 0.003);
     graphics::DrawTexture(vec2(0, 0), window_width, window_height, fbo.m_texture_id, false);
-    resmngr.m_post_processing_shader.Deactivate();
+    //resmngr.m_post_processing_shader.Deactivate();
 
     guilib.Draw();
 

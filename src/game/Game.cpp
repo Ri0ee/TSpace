@@ -47,6 +47,14 @@ namespace game
         bullet_shape.m_color.b = 0;
         bullet_shape.m_color.a = 100;
 
+        m_test_poly.m_color = color{255, 255, 255, 100};
+        m_test_poly.addVertex(0, 0);
+        m_test_poly.addVertex(25, 50);
+        m_test_poly.addVertex(100, 90);
+        m_test_poly.addVertex(50, 200);
+        m_test_poly.addVertex(30, 200);
+        m_test_poly.addVertex(30, 100);
+
         m_vecBorderMeshes[0] = GenerateBorderMesh(true);
         m_vecBorderMeshes[1] = GenerateBorderMesh(true);
         m_vecBorderMeshes[2] = GenerateBorderMesh(false);
@@ -67,7 +75,7 @@ namespace game
             m_border_top_last_connection_point = random_bind;
             srand(GetTime());
             for(int i = 1; i < BORDER_MESH_GENERATION_STEPS; i++)
-                temp_polygon.addVertex(m_window_width - ((m_window_width / BORDER_MESH_GENERATION_STEPS) * i), (rand() % BORDER_MESH_BOUND_Y) * 2);
+                temp_polygon.addVertex(m_window_width - ((m_window_width / BORDER_MESH_GENERATION_STEPS) * i), (rand() % BORDER_MESH_BOUND_Y) * 2 + 10);
         }
         else
         {
@@ -79,7 +87,7 @@ namespace game
             m_border_bottom_last_connection_point = random_bind;
             srand(GetTime() / 2);
             for(int i = 1; i < BORDER_MESH_GENERATION_STEPS; i++)
-                temp_polygon.addVertex(m_window_width - ((m_window_width / BORDER_MESH_GENERATION_STEPS) * i), (rand() % BORDER_MESH_BOUND_Y) * 2 - BORDER_MESH_BOUND_Y);
+                temp_polygon.addVertex(m_window_width - ((m_window_width / BORDER_MESH_GENERATION_STEPS) * i), (rand() % BORDER_MESH_BOUND_Y) * 2 - BORDER_MESH_BOUND_Y + 10);
 
         }
         return temp_polygon;
@@ -127,7 +135,6 @@ namespace game
 
     bool TGame::FindBorderCollision(int border, float deltaTime, float &penetration_depth)
     {
-        std::cout << "Looking for collision with border n = " << border << std::endl;
         TPolygon tempE1 = m_vecEntities[0].m_vecPolygon[0]; //Player
         TPolygon tempE2 = m_vecBorderMeshes[border]; //Border
 
@@ -262,6 +269,7 @@ namespace game
             m_vecEntities[0].m_velocity_x = 0;
         }
 
+        /*
         for(int i = 0; i < 4; i++)
         {
             float penetration_depth = 0;
@@ -271,9 +279,10 @@ namespace game
                 m_vecCollisions.push_back(temp_collision);
                 m_collision_flag = true;
                 m_collsion_depth = penetration_depth;
+                std::cout << "collided with borders (" << i << "), penetration_depth = " << penetration_depth << std::endl;
             }
         }
-
+        */
         ///Looking for Collision
         for(unsigned int i = 0; i < m_vecEntities.size(); i++)
         {
@@ -286,7 +295,6 @@ namespace game
                     m_vecCollisions.push_back(temp_collision);
                     m_collision_flag = true;
                     m_collsion_depth = penetration_depth;
-                    std::cout << "collided" << std::endl;
                 }
             }
         }
