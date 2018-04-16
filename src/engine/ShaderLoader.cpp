@@ -11,7 +11,7 @@ string Shader::ReadShader(string filename)
     if(!file.good())
     {
         cerr << "Can't read file '" << filename << "'\n";
-        std::terminate();
+        return "0";
     }
 
     file.seekg(0, std::ios::end);

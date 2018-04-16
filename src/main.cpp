@@ -72,11 +72,12 @@ void GameplayRender()
 {
     graphics::DrawTexture(vec2(0 - background_shift, 0), window_width, window_height, resmngr.m_game_textures["sprite_background"], false);
     graphics::DrawTexture(vec2(window_width - background_shift, 0), window_width, window_height, resmngr.m_game_textures["sprite_background"], false);
-    //Game.m_vecBorderMeshes[0].Draw(0 - background_shift, 0);
-    //Game.m_vecBorderMeshes[1].Draw(window_width - background_shift, 0);
-    //Game.m_vecBorderMeshes[2].Draw(0 - background_shift, window_height - BORDER_MESH_BOUND_Y);
-    //Game.m_vecBorderMeshes[3].Draw(window_width - background_shift, window_height - BORDER_MESH_BOUND_Y);
-    Game.m_test_poly.Draw(500, 50);
+
+    Game.m_vecBorderMeshes[0].Draw(0 - background_shift, 0);
+    Game.m_vecBorderMeshes[1].Draw(window_width - background_shift, 0);
+    Game.m_vecBorderMeshes[2].Draw(0 - background_shift, window_height - BORDER_MESH_BOUND_Y * 2 - 20);
+    Game.m_vecBorderMeshes[3].Draw(window_width - background_shift, window_height - BORDER_MESH_BOUND_Y * 2 - 20);
+
     background_shift++;
     if(background_shift == window_width)
     {
@@ -87,13 +88,16 @@ void GameplayRender()
         Game.m_vecBorderMeshes[3] = Game.GenerateBorderMesh(false);
     }
 
-    for(unsigned int i = 0; i < Game.m_vecEntities.size(); i++)
-        graphics::DrawTexture(vec2(Game.m_vecEntities[i].m_x, Game.m_vecEntities[i].m_y),
-                              Game.m_vecEntities[i].m_width,
-                              Game.m_vecEntities[i].m_height,
-                              resmngr.m_game_textures[Game.m_vecEntities[i].m_sprite_name],
-                              true,
-                              Game.m_vecEntities[i].m_vecPolygon[0].m_color);
+    for(auto it = Game.m_vecEntities.begin(); it != Game.m_vecEntities.end(); it++)
+    {
+//        graphics::DrawTexture(vec2(it->m_x, it->m_y),
+//                              it->m_width,
+//                              it->m_height,
+//                              resmngr.m_game_textures[it->m_sprite_name],
+//                              true,
+//                              it->m_vecPolygon[0].m_color);
+        it->Draw();
+    }
 }
 
 void Render()
@@ -120,26 +124,33 @@ void Render()
     }
 
     graphics::Clear();
-    //resmngr.m_post_processing_shader.Activate(window_width, window_height, GetTime() / 1000, true, 0.003);
+//    resmngr.m_post_processing_shader.Activate(window_width, window_height, GetTime() / 1000, true, 0.003);
     graphics::DrawTexture(vec2(0, 0), window_width, window_height, fbo.m_texture_id, false);
-    //resmngr.m_post_processing_shader.Deactivate();
+//    resmngr.m_post_processing_shader.Deactivate();
 
     guilib.Draw();
 
     color text_color{255, 255, 0, 100};
-    graphics::ftDrawText("fps: " + to_string(FPS), text_color, vec2(0, 10), 10, ftlib);
+    graphics::ftDrawText("Fps: " + to_string(FPS), text_color, vec2(0, 10), 10, ftlib);
     graphics::ftDrawText((Game.m_collision_flag?"collision: yes":"collision: no"), text_color, vec2(0, 21), 10, ftlib);
-    graphics::ftDrawText("depth: " + to_string(Game.m_collsion_depth), text_color, vec2(0, 32), 10, ftlib);
-    graphics::ftDrawText("mouse pos: (" + to_string(mouse_pos.a) + ";" + to_string(mouse_pos.b) + ")", text_color, vec2(0, 44), 10, ftlib);
-    graphics::ftDrawText("Entity_0 pos: (" + to_string(Game.m_vecEntities[0].m_x) + ";" + to_string(Game.m_vecEntities[0].m_y) + ")", text_color, vec2(0, 55), 10, ftlib);
-    graphics::ftDrawText("Entity count: " + to_string(Game.m_entity_count), text_color, vec2(0, 66), 10, ftlib);
+    graphics::ftDrawText("Depth: " + to_string(Game.m_collsion_depth), text_color, vec2(0, 32), 10, ftlib);
+    graphics::ftDrawText("Mouse pos: (" + to_string(mouse_pos.a) + ";" + to_string(mouse_pos.b) + ")", text_color, vec2(0, 44), 10, ftlib);
+    graphics::ftDrawText("Player pos: (" + to_string(Game.m_vecEntities[0].m_x) + ";" + to_string(Game.m_vecEntities[0].m_y) + ")", text_color, vec2(0, 55), 10, ftlib);
+    graphics::ftDrawText("Enemy pos: (" + to_string(Game.m_vecEntities[1].m_x) + ";" + to_string(Game.m_vecEntities[1].m_y) + ")", text_color, vec2(0, 66), 10, ftlib);
+    graphics::ftDrawText("Entity count: " + to_string((int)Game.m_vecEntities.size()), text_color, vec2(0, 78), 10, ftlib);
 
     glfwSwapBuffers(window);
 }
 
-void button_1_callback()
+void Start_button_callback()
 {
     cout << "Callback function called\n";
+}
+
+void Exit_button_callback()
+{
+    std::cout << "Exit button callback called" << std::endl;
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
 void InitGUI()
@@ -154,7 +165,8 @@ void InitGUI()
     TButton button_1(vertex, vec2(window_width - 300, 10), 2, btncolor, fg_btncolor, hl_btncolor, "Start", &ftlib);
     TButton button_2(vertex, vec2(window_width - 300, 80), 2, btncolor, fg_btncolor, hl_btncolor, "Upgrade", &ftlib);
     TButton button_3(vertex, vec2(window_width - 300, 150), 2, btncolor, fg_btncolor, hl_btncolor, "Exit", &ftlib);
-    button_1.SetCallback(button_1_callback);
+    button_1.SetCallback(Start_button_callback);
+    button_3.SetCallback(Exit_button_callback);
     guilib.AddButton(button_1);
     guilib.AddButton(button_2);
     guilib.AddButton(button_3);
@@ -260,7 +272,7 @@ int main(int argc, char **argv)
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
-        bool state = false;
+        bool render_state = false;
         float startTime = GetTime();
         float passedTime = startTime - lastTime;
         lastTime = GetTime();
@@ -282,9 +294,9 @@ int main(int argc, char **argv)
                 frameCount = 0;
                 frameCounter = 0;
             }
-            state = true;
+            render_state = true;
         }
-        if(state)
+        if(render_state)
         {
             Render();
             frameCount++;
@@ -292,5 +304,5 @@ int main(int argc, char **argv)
     }
 
     glfwTerminate();
-    return 1;
+    return 0;
 }

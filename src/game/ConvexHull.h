@@ -6,7 +6,11 @@
 #include "Structures.h"
 #include <Utility.h>
 
-std::vector<vec2> Convex(std::vector<vec2> vecIn);
+#define CCW 1
+#define CW 2
+#define F 0
+
+bool Convex(std::vector<vec2> vecIn, std::vector<vec2>& vecOut);
 
 struct Hull{
     public:

@@ -55,18 +55,19 @@ void TPolygon::Draw(float X0, float Y0)
         temp_polygon[i].id = i;
     }
 
-    std::list<TPPLPoly> result;
-    pp.ConvexPartition_HM(&temp_polygon, &result);
+    std::list<TPPLPoly> triangles;
+    pp.Triangulate_OPT(&temp_polygon, &triangles);
 
-    for(auto it = result.begin(); it != result.end(); it++)
+    int numtriangles = triangles.size();
+
+    for(auto it = triangles.begin(); it != triangles.end(); it++)
     {
         std::vector<vec2> temp_vector;
         for(int i = 0; i < it->GetNumPoints(); i++)
             temp_vector.push_back(vec2(it->GetPoint(i).x, it->GetPoint(i).y));
         graphics::DrawPolygon(temp_vector, m_color, vec2(X0, Y0), false, 2);
     }
-
-    graphics::DrawPolygon(m_vec_vertex_out.m_vec_vertex, m_color, vec2(X0, Y0 + 300), false, 2);
+    graphics::DrawPolygon(m_vec_vertex_out.m_vec_vertex, m_color, vec2(X0, Y0), false, 2);
 }
 
 void TPolygon::RotateBase(float angle, float X0, float Y0)
@@ -101,7 +102,7 @@ void TPolygon::Rotate(float angle, float X0, float Y0)
     }
 }
 
-bool TPolygon::FindForwardCollsion(TPolygon second_polygon, float& penetration_depth)
+bool TPolygon::FindForwardCollsionMinkowski(TPolygon second_polygon, float& penetration_depth)
 {
     TPPLPartition pp;
 
@@ -111,25 +112,57 @@ bool TPolygon::FindForwardCollsion(TPolygon second_polygon, float& penetration_d
     TPPLPoly temp_poly_2; ///second polygon
     temp_poly_2.Init(second_polygon.m_vec_vertex_out.m_vec_vertex.size());
 
-    for(unsigned int i = 0; i < m_vec_vertex_out.m_vec_vertex.size(); i++) ///transfering vertecies from TPolygon to TPPLPoly
+    for(unsigned int i = 0; i < m_vec_vertex_out.m_vec_vertex.size(); i++) ///transferring verticies from TPolygon to TPPLPoly
     {
         temp_poly_1[i].x = m_vec_vertex_out.m_vec_vertex[i].a;
         temp_poly_1[i].y = m_vec_vertex_out.m_vec_vertex[i].b;
     }
 
-    for(unsigned int i = 0; i < second_polygon.m_vec_vertex_out.m_vec_vertex.size(); i++) ///transfering vertecies from TPolygon to TPPLPoly
+    for(unsigned int i = 0; i < second_polygon.m_vec_vertex_out.m_vec_vertex.size(); i++) ///transferring verticies from TPolygon to TPPLPoly
     {
         temp_poly_2[i].x = second_polygon.m_vec_vertex_out.m_vec_vertex[i].a;
         temp_poly_2[i].y = second_polygon.m_vec_vertex_out.m_vec_vertex[i].b;
     }
 
+    /*
+    std::cout << "temp_poly_1: " << std::endl;
+    for(int i = 0; i < temp_poly_1.GetNumPoints(); i++)
+        std::cout << "(" << temp_poly_1[i].x << ";" << temp_poly_1[i].y << ")" << std::endl;
+
+    std::cout << "temp_poly_2: " << std::endl;
+    for(int i = 0; i < temp_poly_2.GetNumPoints(); i++)
+        std::cout << "(" << temp_poly_2[i].x << ";" << temp_poly_2[i].y << ")" << std::endl;
+    */
+
     std::list<TPPLPoly> p1;
     std::list<TPPLPoly> p2;
-    pp.ConvexPartition_HM(&temp_poly_1, &p1);
-    pp.ConvexPartition_HM(&temp_poly_2, &p2);
+    pp.Triangulate_OPT(&temp_poly_1, &p1);
+    pp.Triangulate_OPT(&temp_poly_2, &p2);
+
+    /*
+    std::cout << "p1 size = " << p1.size() << std::endl;
+    for(auto it = p1.begin(); it != p1.end(); it++)
+    {
+        std::cout << "p1 element: " << std::endl;
+        for(int j = 0; j < it->GetNumPoints(); j++)
+        {
+            std::cout << "(" << it->GetPoint(j).x << ";" << it->GetPoint(j).y << ")" << std::endl;
+        }
+    }
+
+    std::cout << "p2 size = " << p2.size() << std::endl;
+    for(auto it = p2.begin(); it != p2.end(); it++)
+    {
+        std::cout << "p2 element: " << std::endl;
+        for(int j = 0; j < it->GetNumPoints(); j++)
+        {
+            std::cout << "(" << it->GetPoint(j).x << ";" << it->GetPoint(j).y << ")" << std::endl;
+        }
+    }
+    */
 
     bool temp_collision_state = false;
-    float temp_penetration_depth = 0;
+    float temp_penetration_depth = 2000000000;
     for(auto it = p1.begin(); it != p1.end(); it++)
     {
         Minkowski_Set temp_m_set;
@@ -153,4 +186,54 @@ bool TPolygon::FindForwardCollsion(TPolygon second_polygon, float& penetration_d
 
     penetration_depth = temp_penetration_depth;
     return temp_collision_state;
+}
+
+bool TPolygon::FindForwardCollsionPC(TPolygon second_polygon)
+{
+    TPPLPartition pp;
+
+    TPPLPoly temp_poly_1; ///this polygon
+    temp_poly_1.Init(m_vec_vertex_out.m_vec_vertex.size());
+
+    TPPLPoly temp_poly_2; ///second polygon
+    temp_poly_2.Init(second_polygon.m_vec_vertex_out.m_vec_vertex.size());
+
+    for(unsigned int i = 0; i < m_vec_vertex_out.m_vec_vertex.size(); i++) ///transferring verticies from TPolygon to TPPLPoly
+    {
+        temp_poly_1[i].x = m_vec_vertex_out.m_vec_vertex[i].a;
+        temp_poly_1[i].y = m_vec_vertex_out.m_vec_vertex[i].b;
+    }
+
+    for(unsigned int i = 0; i < second_polygon.m_vec_vertex_out.m_vec_vertex.size(); i++) ///transferring verticies from TPolygon to TPPLPoly
+    {
+        temp_poly_2[i].x = second_polygon.m_vec_vertex_out.m_vec_vertex[i].a;
+        temp_poly_2[i].y = second_polygon.m_vec_vertex_out.m_vec_vertex[i].b;
+    }
+
+    std::list<TPPLPoly> p1;
+    std::list<TPPLPoly> p2;
+    pp.Triangulate_OPT(&temp_poly_1, &p1);
+    pp.Triangulate_OPT(&temp_poly_2, &p2);
+
+    for(auto it_1 = p1.begin(); it_1 != p1.end(); it_1++)
+    {
+        std::vector<vec2> temp_vector_1;
+        for(int i = 0; i < 3; i++)
+            temp_vector_1.push_back(vec2(it_1->GetPoint(i).x, it_1->GetPoint(i).y));
+
+        for(auto it_2 = p2.begin(); it_2 != p2.end(); it_2++)
+        {
+            std::vector<vec2> temp_vector_2;
+            for(int i = 0; i < 3; i++)
+                temp_vector_2.push_back(vec2(it_2->GetPoint(i).x, it_2->GetPoint(i).y));
+
+            for(int i = 0; i < 3; i++)
+            {
+                if(PointCollisionTest(temp_vector_1, temp_vector_2[i]))
+                    return true;
+            }
+        }
+    }
+
+    return false;
 }

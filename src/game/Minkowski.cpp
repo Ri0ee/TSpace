@@ -38,9 +38,7 @@ Minkowski_Set Minkowski_Set::operator+(Minkowski_Set m_set)
             vec2 temp_vertex(m_vec_vertex[i].a + m_set.m_vec_vertex[j].a, m_vec_vertex[i].b + m_set.m_vec_vertex[j].b);
 
             unsigned int k = 0;
-            do{k++;}
-            while((k < temp_m_set.m_vec_vertex.size()) && ((temp_m_set.m_vec_vertex[k].a != temp_vertex.a) ||
-                                                           (temp_m_set.m_vec_vertex[k].b != temp_vertex.b)));
+            do{k++;} while((k < temp_m_set.m_vec_vertex.size()) && ((temp_m_set.m_vec_vertex[k].a != temp_vertex.a) || (temp_m_set.m_vec_vertex[k].b != temp_vertex.b)));
             if(k >= temp_m_set.m_vec_vertex.size())
                 temp_m_set.m_vec_vertex.push_back(temp_vertex);
         }
@@ -58,12 +56,17 @@ Minkowski_Set Minkowski_Set::operator-(Minkowski_Set m_set)
 bool Minkowski_Set::Intersect(Minkowski_Set m_set)
 {
     Minkowski_Set temp_m_set = *this - m_set;
-    vector<vec2> vec_vertex_convex = Convex(temp_m_set.m_vec_vertex);
-    bool testState = PointCollisionTest(vec_vertex_convex, vec2(0, 0));
-    if(testState == true)
-        m_nearest_point = GetNearestPoint(vec_vertex_convex, m_nearest_point_length);
+    vector<vec2> vec_vertex_convex;
+    bool intersection_state = false;
+    if(Convex(temp_m_set.m_vec_vertex, vec_vertex_convex))
+    {
+        intersection_state = PointCollisionTest(vec_vertex_convex, vec2(0, 0));
+        if(intersection_state)
+            m_nearest_point = GetNearestPoint(vec_vertex_convex, m_nearest_point_length);
+    }
 
-    return testState;
+
+    return intersection_state;
 }
 
 vec2 Minkowski_Set::GetNearestPoint(vector<vec2> vec_vertex, float &length)
@@ -80,7 +83,7 @@ vec2 Minkowski_Set::GetNearestPoint(vector<vec2> vec_vertex, float &length)
     float miny = -(b * c) / ((a * a) + (b * b));
     float minvecDist = (minx * minx) + (miny * miny);
 
-    for(unsigned int i = 0; i < vec_vertex.size() - 1; i++)
+    for(auto i = 0; i < vec_vertex.size() - 1; i++)
     {
         a = vec_vertex[i].b - vec_vertex[i + 1].a;
         b = vec_vertex[i + 1].a - vec_vertex[i].a;

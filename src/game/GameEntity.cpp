@@ -19,7 +19,8 @@ TGameEntity::TGameEntity(const string& entity_name, const string& sprite_name, T
     m_current_life = 100;
 
     FindBoudaries();
-    m_vecPolygon[0].Rotate(M_PI_2, m_width, m_height);
+    if(entity_name != "Bullet")
+        m_vecPolygon[0].Rotate(M_PI_2, m_width, m_height);
 }
 
 TGameEntity::~TGameEntity()

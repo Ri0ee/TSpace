@@ -47,6 +47,7 @@
 			<Add directory="lib" />
 		</Compiler>
 		<Linker>
+			<Add option="-static" />
 			<Add library="lib/libglew_static.a" />
 			<Add library="lib/libglfw3.a" />
 			<Add library="gdi32" />
@@ -74,10 +75,6 @@
 		<Unit filename="src/engine/TGALoader.h" />
 		<Unit filename="src/engine/TextureLoader.cpp" />
 		<Unit filename="src/engine/TextureLoader.h" />
-		<Unit filename="src/engine/UI/Button.cpp" />
-		<Unit filename="src/engine/UI/Button.h" />
-		<Unit filename="src/engine/UI/Gui.cpp" />
-		<Unit filename="src/engine/UI/Gui.h" />
 		<Unit filename="src/engine/polypartition.cpp" />
 		<Unit filename="src/engine/polypartition.h" />
 		<Unit filename="src/engine/shaders/BasicShader.cpp" />
@@ -88,6 +85,10 @@
 		<Unit filename="src/engine/shaders/GlitchShader.h" />
 		<Unit filename="src/engine/shaders/PostProcessingShader.cpp" />
 		<Unit filename="src/engine/shaders/PostProcessingShader.h" />
+		<Unit filename="src/engine/ui/Button.cpp" />
+		<Unit filename="src/engine/ui/Button.h" />
+		<Unit filename="src/engine/ui/Gui.cpp" />
+		<Unit filename="src/engine/ui/Gui.h" />
 		<Unit filename="src/game/ConvexHull.cpp" />
 		<Unit filename="src/game/ConvexHull.h" />
 		<Unit filename="src/game/Game.cpp" />

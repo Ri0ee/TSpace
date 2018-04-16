@@ -53,9 +53,13 @@ namespace game
             void AddBullet();
             void ClearCollisions();
             TPolygon GenerateBorderMesh(bool position_top);
-            bool FindForwardCollision(int entity_1, int entity_2, float deltaTime, float &penetration_depth);
-            bool FindBorderCollision(int border, float deltaTime, float &penetration_depth);
-            TGameEntity& GetEntity(string entity_name);
+
+            bool FindForwardCollisionMinkowski(int entity_1, int entity_2, float deltaTime, float &penetration_depth); ///Not really working yet
+            bool FindBorderCollisionMinkowski(int border, float deltaTime, float &penetration_depth); ///Not really working yet
+
+            bool FindForwardCollisionPC(int entity_1, int entity_2, float deltaTime);
+            bool FindBorderCollisionPC(int border, float deltaTime);
+
 
             vector<TGameEntity> m_vecEntities;
             vector<collision> m_vecCollisions;
@@ -67,7 +71,6 @@ namespace game
             bool m_collision_flag;
             float m_collsion_depth;
             int m_sleep_time;
-            int m_entity_count;
 
             int m_window_width;
             int m_window_height;
