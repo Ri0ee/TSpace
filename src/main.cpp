@@ -93,13 +93,13 @@ void GameplayRender()
 
     for(auto it = Game.m_vecEntities.begin(); it != Game.m_vecEntities.end(); it++)
     {
-//        graphics::DrawTexture(vec2(it->m_x, it->m_y),
-//                              it->m_width,
-//                              it->m_height,
-//                              resmngr.m_game_textures[it->m_sprite_name],
-//                              true,
-//                              it->m_vecPolygon[0].m_color);
-        it->Draw();
+        graphics::DrawTexture(vec2(it->m_x, it->m_y),
+                              it->m_width,
+                              it->m_height,
+                              resmngr.m_game_textures[it->m_sprite_name],
+                              true,
+                              it->m_vecPolygon[0].m_color);
+        //it->Draw();
     }
 }
 
@@ -133,19 +133,10 @@ void Render()
     resmngr.m_post_processing_shader.Deactivate();
     one_more_buffer.Unbind();
 
-    /*
-    one_more_buffer.Bind();
     graphics::Clear();
-    resmngr.m_post_processing_shader.Activate(window_width, window_height, GetTime() / 1000, true, 0.003);
-    graphics::DrawTexture(vec2(0, 0), window_width, window_height, fbo.m_texture_id, false);
-    resmngr.m_post_processing_shader.Deactivate();
-    one_more_buffer.Unbind();
-    */
-
-    graphics::Clear();
-    //resmngr.m_glitch_shader.Activate(Game.m_shaking_rating, window_width, window_height);
+    resmngr.m_glitch_shader.Activate(Game.m_shaking_rating, window_width, window_height);
     graphics::DrawTexture(vec2(0, 0), window_width, window_height, one_more_buffer.m_texture_id, false);
-    //resmngr.m_glitch_shader.Deactivate();
+    resmngr.m_glitch_shader.Deactivate();
 
     if(Game.m_shaking_rating > 1)
         Game.m_shaking_rating = Game.m_shaking_rating - 0.2;

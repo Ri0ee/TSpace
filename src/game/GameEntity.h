@@ -9,19 +9,24 @@
 #include "Logger.h"
 #include "Render.h"
 
+#define PLAYER 0
+#define ENEMY 1
+#define BULLET 2
+
 using std::vector;
 using std::string;
 
 class TGameEntity
 {
     public:
-        TGameEntity(const string& entity_name, const string& sprite_name, TPolygon polygon, vec2 origin, vec2 acceleration, int life_time, int max_life_time);
+        TGameEntity(int entity_type, const string& sprite_name, TPolygon polygon, vec2 origin, vec2 acceleration, int life_time, int max_life_time);
         virtual ~TGameEntity();
 
         void AddShape(TPolygon polygon);
         void Draw();
         void FindBoudaries();
 
+        int m_type;
         string m_name;
         string m_sprite_name;
         float m_x;

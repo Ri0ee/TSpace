@@ -27,48 +27,26 @@ namespace game
         m_window_height = window_height;
 
         TPolygon Triangle(255, 255, 255, 100);
+        Triangle.addVertex(0, 0);
+        Triangle.addVertex(50, 25);
         Triangle.addVertex(0, 50);
-        Triangle.addVertex(50, 50);
-        Triangle.addVertex(25, 0);
-        AddEntity(TGameEntity("Player", "sprite_ship", Triangle, vec2(10, window_height / 2 - 25), vec2(10, 10), -1, 0));
-
-        AddEntity(TGameEntity("Enemy", "sprite_ship", Triangle, vec2(700, window_height / 2 - 25), vec2(10, 10), -1, 0));
+        AddEntity(TGameEntity(PLAYER, "sprite_ship", Triangle, vec2(10, window_height / 2 - 25), vec2(10, 10), -1, 0));
 
         TPolygon Square(255, 0, 0, 100);
-        Square.addVertex(0, 50);
         Square.addVertex(0, 0);
         Square.addVertex(50, 0);
         Square.addVertex(50, 50);
-        AddEntity(TGameEntity("Enemy", "sprite_enemy_1", Square, vec2(500, 200), vec2(10, 10), -1, 0));
+        Square.addVertex(0, 50);
+        AddEntity(TGameEntity(ENEMY, "sprite_enemy_1", Square, vec2(500, 200), vec2(10, 10), -1, 0));
 
-        bullet_shape.addVertex(0, 5);
-        bullet_shape.addVertex(50, 5);
+        bullet_shape.addVertex(0, 0);
         bullet_shape.addVertex(50, 0);
-        bullet_shape.addVertex(0, 0);
+        bullet_shape.addVertex(50, 5);
+        bullet_shape.addVertex(0, 5);
         bullet_shape.m_color.r = 255;
         bullet_shape.m_color.g = 0;
         bullet_shape.m_color.b = 0;
         bullet_shape.m_color.a = 100;
-
-        /*
-        bullet_shape.addVertex(0, 0);
-        bullet_shape.addVertex(0, 50);
-        bullet_shape.addVertex(5, 50);
-        bullet_shape.addVertex(5, 0);
-        bullet_shape.m_color.r = 255;
-        bullet_shape.m_color.g = 0;
-        bullet_shape.m_color.b = 0;
-        bullet_shape.m_color.a = 100;
-        */
-        /*
-        m_test_poly.m_color = color{255, 255, 255, 100};
-        m_test_poly.addVertex(0, 0);
-        m_test_poly.addVertex(25, 50);
-        m_test_poly.addVertex(100, 90);
-        m_test_poly.addVertex(50, 200);
-        m_test_poly.addVertex(30, 200);
-        m_test_poly.addVertex(30, 100);
-        */
 
         m_vecBorderMeshes[0] = GenerateBorderMesh(true);
         m_vecBorderMeshes[1] = GenerateBorderMesh(true);
@@ -125,13 +103,13 @@ namespace game
         float e2_X0_t = m_vecEntities[entity_2].m_x + m_vecEntities[entity_2].m_velocity_x * deltaTime;
         float e2_Y0_t = m_vecEntities[entity_2].m_y + m_vecEntities[entity_2].m_velocity_y * deltaTime;
 
-        for(auto it = tempE1.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE1.m_vec_vertex_out.m_vec_vertex.end(); it++)
+        for(auto it = tempE1.m_vec_vertex.m_vec_vertex.begin(); it != tempE1.m_vec_vertex.m_vec_vertex.end(); it++)
         {
             it->a += X0_t;
             it->b += Y0_t;
         }
 
-        for(auto it = tempE2.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE2.m_vec_vertex_out.m_vec_vertex.end(); it++)
+        for(auto it = tempE2.m_vec_vertex.m_vec_vertex.begin(); it != tempE2.m_vec_vertex.m_vec_vertex.end(); it++)
         {
             it->a += e2_X0_t;
             it->b += e2_Y0_t;
@@ -162,13 +140,13 @@ namespace game
             e2_Y0_t = m_window_height - 200;
         }
 
-        for(auto it = tempE1.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE1.m_vec_vertex_out.m_vec_vertex.end(); it++)
+        for(auto it = tempE1.m_vec_vertex.m_vec_vertex.begin(); it != tempE1.m_vec_vertex.m_vec_vertex.end(); it++)
         {
             it->a += X0_t;
             it->b += Y0_t;
         }
 
-        for(auto it = tempE2.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE2.m_vec_vertex_out.m_vec_vertex.end(); it++)
+        for(auto it = tempE2.m_vec_vertex.m_vec_vertex.begin(); it != tempE2.m_vec_vertex.m_vec_vertex.end(); it++)
         {
             it->a += e2_X0_t;
             it->b += e2_Y0_t;
@@ -188,13 +166,13 @@ namespace game
         float e2_X0_t = m_vecEntities[entity_2].m_x + m_vecEntities[entity_2].m_velocity_x * deltaTime;
         float e2_Y0_t = m_vecEntities[entity_2].m_y + m_vecEntities[entity_2].m_velocity_y * deltaTime;
 
-        for(auto it = tempE1.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE1.m_vec_vertex_out.m_vec_vertex.end(); it++)
+        for(auto it = tempE1.m_vec_vertex.m_vec_vertex.begin(); it != tempE1.m_vec_vertex.m_vec_vertex.end(); it++)
         {
             it->a += X0_t;
             it->b += Y0_t;
         }
 
-        for(auto it = tempE2.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE2.m_vec_vertex_out.m_vec_vertex.end(); it++)
+        for(auto it = tempE2.m_vec_vertex.m_vec_vertex.begin(); it != tempE2.m_vec_vertex.m_vec_vertex.end(); it++)
         {
             it->a += e2_X0_t;
             it->b += e2_Y0_t;
@@ -238,13 +216,13 @@ namespace game
             e2_Y0_t = m_window_height - 200;
         }
 
-        for(auto it = tempE1.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE1.m_vec_vertex_out.m_vec_vertex.end(); it++)
+        for(auto it = tempE1.m_vec_vertex.m_vec_vertex.begin(); it != tempE1.m_vec_vertex.m_vec_vertex.end(); it++)
         {
             it->a += X0_t;
             it->b += Y0_t;
         }
 
-        for(auto it = tempE2.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE2.m_vec_vertex_out.m_vec_vertex.end(); it++)
+        for(auto it = tempE2.m_vec_vertex.m_vec_vertex.begin(); it != tempE2.m_vec_vertex.m_vec_vertex.end(); it++)
         {
             it->a += e2_X0_t;
             it->b += e2_Y0_t;
@@ -255,13 +233,18 @@ namespace game
 
     void TGame::AddBullet()
     {
-        TGameEntity bullet("Bullet", "sprite_bullet", bullet_shape, vec2(m_vecEntities[0].m_x + 51, m_vecEntities[0].m_y), vec2(0, 0), 0, 100);
-        TGameEntity bullet2("Bullet", "sprite_bullet", bullet_shape, vec2(m_vecEntities[0].m_x + 51, m_vecEntities[0].m_y + m_vecEntities[0].m_height-5), vec2(0, 0), 0, 100);
+        TGameEntity bullet(BULLET, "sprite_bullet", bullet_shape, vec2(m_vecEntities[0].m_x + 51, m_vecEntities[0].m_y), vec2(0, 0), 0, 100);
+        TGameEntity bullet2(BULLET, "sprite_bullet", bullet_shape, vec2(m_vecEntities[0].m_x + 51, m_vecEntities[0].m_y + m_vecEntities[0].m_height-5), vec2(0, 0), 0, 100);
         bullet.m_velocity_x = BULLET_VELOCITY;
         bullet2.m_velocity_x = BULLET_VELOCITY;
         AddEntity(bullet);
         AddEntity(bullet2);
         m_shaking_rating = m_shaking_rating + 1;
+    }
+
+    void TGame::Shoot(int shooter_entity_id, int direction, int ammount)
+    {
+
     }
 
     void TGame::Input(bool* keys)
@@ -310,18 +293,17 @@ namespace game
 
     void TGame::EnemyAI()
     {
-        for(auto it = m_vecEntities.begin(); it != m_vecEntities.end(); it++)
+        for(int i = 0; i < m_vecEntities.size(); i++)
         {
-            if(it->m_name == "Enemy")
+            if(m_vecEntities[i].m_type == ENEMY)
             {
-                it->m_shoot_timer++;
-                if(it->m_shoot_timer > 100)
+                m_vecEntities[i].m_shoot_timer++;
+                if(m_vecEntities[i].m_shoot_timer > 100)
                 {
-                    //AddBullet();
-                    it->m_shoot_timer = 0;
+                    AddBullet();
+                    m_vecEntities[i].m_shoot_timer = 0;
                 }
             }
-
         }
     }
 

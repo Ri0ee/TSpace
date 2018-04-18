@@ -25,14 +25,10 @@ class TPolygon
         void addVertex(vec2 vertex);
         void addVertex(float x, float y);
         void Draw(float x0, float y0);
-        void Rotate(float angle, float x0, float y0);
-        void RotateBase(float angle, float x0, float y0);
 
         bool FindForwardCollsionMinkowski(TPolygon second_polygon, float &penetrationDepth);
         bool FindForwardCollsionPC(TPolygon second_polygon);
 
         color m_color;
-        Minkowski_Set m_vec_vertex_base;
-        Minkowski_Set m_vec_vertex_out;
-        bool m_is_changed;
+        Minkowski_Set m_vec_vertex;
 };
