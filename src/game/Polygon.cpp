@@ -212,22 +212,27 @@ bool TPolygon::FindForwardCollsionPC(TPolygon second_polygon)
 
     std::list<TPPLPoly> p1;
     std::list<TPPLPoly> p2;
-    pp.Triangulate_OPT(&temp_poly_1, &p1);
-    pp.Triangulate_OPT(&temp_poly_2, &p2);
+//    pp.Triangulate_OPT(&temp_poly_1, &p1);
+//    pp.Triangulate_OPT(&temp_poly_2, &p2);
+    pp.Triangulate_EC(&temp_poly_1, &p1);
+    pp.Triangulate_EC(&temp_poly_2, &p2);
+
+    int pp1size = p1.size();
+    int pp2size = p2.size();
 
     for(auto it_1 = p1.begin(); it_1 != p1.end(); it_1++)
     {
         std::vector<vec2> temp_vector_1;
-        for(int i = 0; i < 3; i++)
+        for(int i = 0; i < it_1->GetNumPoints(); i++)
             temp_vector_1.push_back(vec2(it_1->GetPoint(i).x, it_1->GetPoint(i).y));
 
         for(auto it_2 = p2.begin(); it_2 != p2.end(); it_2++)
         {
             std::vector<vec2> temp_vector_2;
-            for(int i = 0; i < 3; i++)
+            for(int i = 0; i < it_2->GetNumPoints(); i++)
                 temp_vector_2.push_back(vec2(it_2->GetPoint(i).x, it_2->GetPoint(i).y));
 
-            for(int i = 0; i < 3; i++)
+            for(int i = 0; i < it_2->GetNumPoints(); i++)
             {
                 if(PointCollisionTest(temp_vector_1, temp_vector_2[i]))
                     return true;

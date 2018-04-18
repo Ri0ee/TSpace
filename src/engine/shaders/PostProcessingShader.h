@@ -26,4 +26,5 @@ class TPostProcessingShader
         GLuint m_time_loc;
         GLuint m_vignette_loc;
         GLuint m_doublerating_loc;
+        GLuint m_coef_loc;
 };

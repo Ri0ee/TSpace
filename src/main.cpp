@@ -63,6 +63,7 @@ TPostProcessingShader PPShader;
 
 TFrameBuffer fbo;
 TFrameBuffer fbo_msaa;
+TFrameBuffer one_more_buffer;
 
 float background_shift;
 
@@ -87,6 +88,8 @@ void GameplayRender()
         Game.m_vecBorderMeshes[2] = Game.m_vecBorderMeshes[3];
         Game.m_vecBorderMeshes[3] = Game.GenerateBorderMesh(false);
     }
+
+    Game.m_border_shift = background_shift;
 
     for(auto it = Game.m_vecEntities.begin(); it != Game.m_vecEntities.end(); it++)
     {
@@ -123,10 +126,29 @@ void Render()
         fbo.Unbind();
     }
 
+    one_more_buffer.Bind();
     graphics::Clear();
-//    resmngr.m_post_processing_shader.Activate(window_width, window_height, GetTime() / 1000, true, 0.003);
+    resmngr.m_post_processing_shader.Activate(window_width, window_height, GetTime() / 1000, true, 0.003);
+    graphics::DrawTexture(vec2(0, 0), window_width, window_height, fbo.m_texture_id, true);
+    resmngr.m_post_processing_shader.Deactivate();
+    one_more_buffer.Unbind();
+
+    /*
+    one_more_buffer.Bind();
+    graphics::Clear();
+    resmngr.m_post_processing_shader.Activate(window_width, window_height, GetTime() / 1000, true, 0.003);
     graphics::DrawTexture(vec2(0, 0), window_width, window_height, fbo.m_texture_id, false);
-//    resmngr.m_post_processing_shader.Deactivate();
+    resmngr.m_post_processing_shader.Deactivate();
+    one_more_buffer.Unbind();
+    */
+
+    graphics::Clear();
+    //resmngr.m_glitch_shader.Activate(Game.m_shaking_rating, window_width, window_height);
+    graphics::DrawTexture(vec2(0, 0), window_width, window_height, one_more_buffer.m_texture_id, false);
+    //resmngr.m_glitch_shader.Deactivate();
+
+    if(Game.m_shaking_rating > 1)
+        Game.m_shaking_rating = Game.m_shaking_rating - 0.2;
 
     guilib.Draw();
 
@@ -246,6 +268,7 @@ void InitEverything()
 
     fbo.Create(window_width, window_height);
     fbo_msaa.CreateMultisampled(window_width, window_height, 4);
+    one_more_buffer.Create(window_width, window_height);
 
     glGetIntegerv(GL_MAX_SAMPLES, &max_msaa_samples);
     DebugOutput();

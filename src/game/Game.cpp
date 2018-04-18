@@ -12,6 +12,8 @@ namespace game
         m_border_bottom_last_connection_point = 90;
         m_border_top_last_connection_point = 90;
         m_vecBorderMeshes.resize(4);
+        m_shaking_rating = 0;
+        m_border_shift = 0;
     }
 
     TGame::~TGame()
@@ -29,6 +31,8 @@ namespace game
         Triangle.addVertex(50, 50);
         Triangle.addVertex(25, 0);
         AddEntity(TGameEntity("Player", "sprite_ship", Triangle, vec2(10, window_height / 2 - 25), vec2(10, 10), -1, 0));
+
+        AddEntity(TGameEntity("Enemy", "sprite_ship", Triangle, vec2(700, window_height / 2 - 25), vec2(10, 10), -1, 0));
 
         TPolygon Square(255, 0, 0, 100);
         Square.addVertex(0, 50);
@@ -149,13 +153,13 @@ namespace game
 
         if(border == 0 || border == 1)
         {
-            e2_X0_t = 0;
+            e2_X0_t = 0 - m_border_shift;
             e2_Y0_t = 0;
         }
         if(border == 2 || border == 3)
         {
-            e2_X0_t = 0;
-            e2_Y0_t = m_window_height - 180;
+            e2_X0_t = 0 - m_border_shift;
+            e2_Y0_t = m_window_height - 200;
         }
 
         for(auto it = tempE1.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE1.m_vec_vertex_out.m_vec_vertex.end(); it++)
@@ -196,6 +200,7 @@ namespace game
             it->b += e2_Y0_t;
         }
 
+
         return (tempE1.FindForwardCollsionPC(tempE2) || tempE2.FindForwardCollsionPC(tempE1));
     }
 
@@ -210,15 +215,27 @@ namespace game
         float e2_X0_t;
         float e2_Y0_t;
 
-        if(border == 0 || border == 1)
+        if(border == 0)
         {
-            e2_X0_t = 0;
+            e2_X0_t = 0 - m_border_shift;
             e2_Y0_t = 0;
         }
-        if(border == 2 || border == 3)
+        if(border == 1)
         {
-            e2_X0_t = 0;
-            e2_Y0_t = m_window_height - 180;
+            e2_X0_t = m_window_width - m_border_shift;
+            e2_Y0_t = 0;
+        }
+
+        if(border == 2)
+        {
+            e2_X0_t = 0 - m_border_shift;
+            e2_Y0_t = m_window_height - 200;
+        }
+
+        if(border == 3)
+        {
+            e2_X0_t = m_window_width - m_border_shift;
+            e2_Y0_t = m_window_height - 200;
         }
 
         for(auto it = tempE1.m_vec_vertex_out.m_vec_vertex.begin(); it != tempE1.m_vec_vertex_out.m_vec_vertex.end(); it++)
@@ -244,6 +261,7 @@ namespace game
         bullet2.m_velocity_x = BULLET_VELOCITY;
         AddEntity(bullet);
         AddEntity(bullet2);
+        m_shaking_rating = m_shaking_rating + 1;
     }
 
     void TGame::Input(bool* keys)
@@ -364,6 +382,8 @@ namespace game
             }
         }
 
+        int ecount = m_vecEntities.size();
+
         ///Looking for Collision
         for(unsigned int i = 0; i < m_vecEntities.size(); i++)
         {
@@ -381,7 +401,7 @@ namespace game
         ///Collision Processing (Borders)
         for(auto it = m_vecCollisions.begin(); it != m_vecCollisions.end(); it++)
         {
-           if((it->eID_1 == 0) && (it->eID_2 >= 666))
+           if((it->eID_2 == 0) && (it->eID_1 >= 666))
            {
                m_vecEntities[0].m_velocity_x = -m_vecEntities[0].m_velocity_x;
                m_vecEntities[0].m_velocity_y = -m_vecEntities[0].m_velocity_y;

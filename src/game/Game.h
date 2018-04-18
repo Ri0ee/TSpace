@@ -13,7 +13,7 @@
 #include "ETime.h"
 
 #define DECIPATON 0.02
-#define BULLET_VELOCITY 5000
+#define BULLET_VELOCITY 1000
 #define BORDER_MESH_BOUND_Y 90
 #define MIN_BORDER_MESH_DEPTH 10
 #define BORDER_MESH_GENERATION_STEPS 10
@@ -74,6 +74,9 @@ namespace game
 
             int m_window_width;
             int m_window_height;
+
+            float m_shaking_rating;
+            float m_border_shift;
 
             float m_border_top_last_connection_point;
             float m_border_bottom_last_connection_point;
