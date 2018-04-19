@@ -99,7 +99,18 @@ void GameplayRender()
                               resmngr.m_game_textures[it->m_sprite_name],
                               true,
                               it->m_vecPolygon[0].m_color);
-        //it->Draw();
+
+        if(it->m_type == PLAYER || it->m_type == ENEMY)
+        {
+            float width = it->m_width / it->m_maximum_life * it->m_current_life;
+
+            TPolygon health_bar(255, 255, 255, 100);
+            health_bar.addVertex(0, 0);
+            health_bar.addVertex(width, 0);
+            health_bar.addVertex(width, 5);
+            health_bar.addVertex(0, 5);
+            health_bar.Draw(it->m_x, it->m_y - 7);
+        }
     }
 }
 
@@ -155,9 +166,22 @@ void Render()
     glfwSwapBuffers(window);
 }
 
+void HideGUI()
+{
+    std::cout << "GUI hidden" << std::endl;
+    guilib.m_visible = false;
+}
+
+void ShowGUI()
+{
+    std::cout << "GUI shown" << std::endl;
+    guilib.m_visible = true;
+}
+
 void Start_button_callback()
 {
     cout << "Callback function called\n";
+    HideGUI();
 }
 
 void Exit_button_callback()

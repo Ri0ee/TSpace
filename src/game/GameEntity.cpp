@@ -8,15 +8,24 @@ TGameEntity::TGameEntity(int entity_type, const string& sprite_name, TPolygon po
     m_vecPolygon.push_back(polygon);
 
     m_type = entity_type;
+
     m_velocity_x = 0;
     m_velocity_y = 0;
     m_acceleration_x = acceleration.a;
     m_acceleration_y = acceleration.b;
-    m_life_time = life_time;
-    m_max_life_time = max_life_time;
-    m_shoot_timer = 0;
+
     m_maximum_life = 100;
-    m_current_life = 100;
+    m_current_life = m_maximum_life;
+    m_maximum_ammo = 30;
+    m_current_ammo = m_maximum_ammo;
+
+    m_max_life_time = max_life_time;
+    m_life_time = life_time;
+
+    m_shoot_timer = 0;
+
+    m_did_hit = false;
+    m_is_destroyed = false;
 
     FindBoudaries();
 }

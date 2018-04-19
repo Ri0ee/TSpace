@@ -14,6 +14,8 @@ namespace game
         m_vecBorderMeshes.resize(4);
         m_shaking_rating = 0;
         m_border_shift = 0;
+        m_game_over = false;
+        m_enemy_spawn_state = false;
     }
 
     TGame::~TGame()
@@ -39,14 +41,11 @@ namespace game
         Square.addVertex(0, 50);
         AddEntity(TGameEntity(ENEMY, "sprite_enemy_1", Square, vec2(500, 200), vec2(10, 10), -1, 0));
 
+        bullet_shape.m_color = color{255, 0, 0, 100};
         bullet_shape.addVertex(0, 0);
         bullet_shape.addVertex(50, 0);
         bullet_shape.addVertex(50, 5);
         bullet_shape.addVertex(0, 5);
-        bullet_shape.m_color.r = 255;
-        bullet_shape.m_color.g = 0;
-        bullet_shape.m_color.b = 0;
-        bullet_shape.m_color.a = 100;
 
         m_vecBorderMeshes[0] = GenerateBorderMesh(true);
         m_vecBorderMeshes[1] = GenerateBorderMesh(true);
@@ -178,7 +177,6 @@ namespace game
             it->b += e2_Y0_t;
         }
 
-
         return (tempE1.FindForwardCollsionPC(tempE2) || tempE2.FindForwardCollsionPC(tempE1));
     }
 
@@ -231,20 +229,25 @@ namespace game
         return (tempE1.FindForwardCollsionPC(tempE2) || tempE2.FindForwardCollsionPC(tempE1));
     }
 
-    void TGame::AddBullet()
-    {
-        TGameEntity bullet(BULLET, "sprite_bullet", bullet_shape, vec2(m_vecEntities[0].m_x + 51, m_vecEntities[0].m_y), vec2(0, 0), 0, 100);
-        TGameEntity bullet2(BULLET, "sprite_bullet", bullet_shape, vec2(m_vecEntities[0].m_x + 51, m_vecEntities[0].m_y + m_vecEntities[0].m_height-5), vec2(0, 0), 0, 100);
-        bullet.m_velocity_x = BULLET_VELOCITY;
-        bullet2.m_velocity_x = BULLET_VELOCITY;
-        AddEntity(bullet);
-        AddEntity(bullet2);
-        m_shaking_rating = m_shaking_rating + 1;
-    }
-
     void TGame::Shoot(int shooter_entity_id, int direction, int ammount)
     {
-
+        for(int i = 0; i < ammount; i++)
+        {
+            float bullet_shift = m_vecEntities[shooter_entity_id].m_height / (ammount + 1) - 3;
+            if(direction == DIRECTION_LEFT)
+            {
+                TGameEntity bullet(BULLET, "sprite_bullet", bullet_shape, vec2(m_vecEntities[shooter_entity_id].m_x - 30, m_vecEntities[shooter_entity_id].m_y + bullet_shift * i), vec2(0, 0), 0, 100);
+                bullet.m_velocity_x = -BULLET_VELOCITY;
+                AddEntity(bullet);
+            }
+            if(direction == DIRECTION_RIGHT)
+            {
+                TGameEntity bullet(BULLET, "sprite_bullet", bullet_shape, vec2(m_vecEntities[shooter_entity_id].m_x + m_vecEntities[shooter_entity_id].m_width + 1, m_vecEntities[shooter_entity_id].m_y + bullet_shift * i), vec2(0, 0), 0, 100);
+                bullet.m_velocity_x = BULLET_VELOCITY;
+                AddEntity(bullet);
+            }
+        }
+        m_shaking_rating++;
     }
 
     void TGame::Input(bool* keys)
@@ -278,7 +281,7 @@ namespace game
         if(keys[GLFW_KEY_ENTER] || keys[GLFW_KEY_SPACE])
             if(m_vecEntities[0].m_shoot_delay > 20)
             {
-                AddBullet();
+                Shoot(0, DIRECTION_RIGHT, 2);
                 m_vecEntities[0].m_shoot_delay = 0;
             }
 
@@ -300,7 +303,7 @@ namespace game
                 m_vecEntities[i].m_shoot_timer++;
                 if(m_vecEntities[i].m_shoot_timer > 100)
                 {
-                    AddBullet();
+                    Shoot(i, DIRECTION_LEFT, 1);
                     m_vecEntities[i].m_shoot_timer = 0;
                 }
             }
@@ -322,7 +325,12 @@ namespace game
             if(it->m_life_time != -1)
                 it->m_life_time++;
 
-            if(((it->m_name == "Bullet") && (it->m_x > 2000)) || ((it->m_life_time != -1) && (it->m_life_time > it->m_max_life_time)))
+            if(
+               ((it->m_type == BULLET) && (it->m_x > 2000)) ||
+               ((it->m_type == BULLET) && (it->m_did_hit)) ||
+               ((it->m_life_time != -1) && (it->m_life_time > it->m_max_life_time)) ||
+               ((it->m_is_destroyed) || (it->m_current_life <= 0))
+              )
             {
                 m_vecEntities.erase(it);
                 it--;
@@ -393,10 +401,37 @@ namespace game
         ///Collision processing (entities)
         for(auto it = m_vecCollisions.begin(); it != m_vecCollisions.end(); it++)
         {
-            if(it->eID_2 < 666 || it->eID_1 < 666)
+            if(it->eID_2 < 666 && it->eID_1 < 666)
             {
-                m_vecEntities[0].m_velocity_x = -m_vecEntities[0].m_velocity_x;
-                m_vecEntities[0].m_velocity_y = -m_vecEntities[0].m_velocity_y;
+                if(m_vecEntities[it->eID_1].m_type == BULLET)
+                {
+                    if(m_vecEntities[it->eID_2].m_type != BULLET)
+                    {
+                        if(!m_vecEntities[it->eID_1].m_did_hit)
+                        {
+                            m_vecEntities[it->eID_2].m_current_life -= 3;
+                            m_vecEntities[it->eID_1].m_did_hit = true;
+                        }
+                    }
+                }
+
+                if(m_vecEntities[it->eID_2].m_type == BULLET)
+                {
+                    if(m_vecEntities[it->eID_1].m_type != BULLET)
+                    {
+                        if(!m_vecEntities[it->eID_2].m_did_hit)
+                        {
+                            m_vecEntities[it->eID_1].m_current_life -= 3;
+                            m_vecEntities[it->eID_2].m_did_hit = true;
+                        }
+                    }
+                }
+
+                if(it->eID_2 == 0 || it->eID_1 == 0)
+                {
+                    m_vecEntities[0].m_velocity_x = -m_vecEntities[0].m_velocity_x;
+                    m_vecEntities[0].m_velocity_y = -m_vecEntities[0].m_velocity_y;
+                }
             }
         }
 

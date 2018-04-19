@@ -13,10 +13,12 @@
 #include "ETime.h"
 
 #define DECIPATON 0.02
-#define BULLET_VELOCITY 1000
+#define BULLET_VELOCITY 3000
 #define BORDER_MESH_BOUND_Y 90
 #define MIN_BORDER_MESH_DEPTH 10
 #define BORDER_MESH_GENERATION_STEPS 10
+#define DIRECTION_LEFT 1
+#define DIRECTION_RIGHT 2
 
 using std::vector;
 using std::string;
@@ -50,7 +52,7 @@ namespace game
             void Update(float delta_time);
             void Init(int window_width, int window_height);
             void AddEntity(TGameEntity entity);
-            void AddBullet();
+            void Shoot(int shooter_entity_id, int direction, int ammount);
             void ClearCollisions();
             TPolygon GenerateBorderMesh(bool position_top);
 
@@ -79,6 +81,9 @@ namespace game
 
             float m_border_top_last_connection_point;
             float m_border_bottom_last_connection_point;
+
+            bool m_game_over;
+            bool m_enemy_spawn_state;
 
             TPolygon bullet_shape;
     };
