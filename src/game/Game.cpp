@@ -16,6 +16,9 @@ namespace game
         m_border_shift = 0;
         m_game_over = false;
         m_enemy_spawn_state = false;
+        m_is_running = false;
+        m_current_wave = 1;
+        m_current_enemy_count = 0;
     }
 
     TGame::~TGame()
@@ -34,7 +37,7 @@ namespace game
         bullet_shape.addVertex(50, 5);
         bullet_shape.addVertex(0, 5);
 
-        bullet_shape_2.m_color = color{0, 0, 255, 100};
+        bullet_shape_2.m_color = color{0, 255, 255, 100};
         bullet_shape_2.addVertex(0, 0);
         bullet_shape_2.addVertex(50, 0);
         bullet_shape_2.addVertex(50, 5);
@@ -51,8 +54,8 @@ namespace game
         enemy_shape.addVertex(50, 50);
         enemy_shape.addVertex(0, 50);
 
-        SpawnPlayer();
-        SpawnEnemies(3);
+//        SpawnPlayer();
+//        SpawnEnemies(3);
 
         m_vecBorderMeshes[0] = GenerateBorderMesh(true);
         m_vecBorderMeshes[1] = GenerateBorderMesh(true);
@@ -263,6 +266,7 @@ namespace game
                     AddEntity(bullet);
                 }
             }
+
             if(direction == DIRECTION_RIGHT)
             {
                 if(shooter_entity_id == 0)
@@ -281,43 +285,46 @@ namespace game
                 }
             }
         }
-        m_shaking_rating++;
+        m_shaking_rating = m_shaking_rating + 0.5;
     }
 
     void TGame::Input(bool* keys)
     {
-        ///Vertical movement
-        if(keys[GLFW_KEY_W])
-            m_vecEntities[0].m_velocity_y -= m_vecEntities[0].m_acceleration_y;
+        if(m_is_running)
+        {
+            ///Vertical movement
+            if(keys[GLFW_KEY_W])
+                m_vecEntities[0].m_velocity_y -= m_vecEntities[0].m_acceleration_y;
 
-        if(keys[GLFW_KEY_S])
-            m_vecEntities[0].m_velocity_y += m_vecEntities[0].m_acceleration_y;
+            if(keys[GLFW_KEY_S])
+                m_vecEntities[0].m_velocity_y += m_vecEntities[0].m_acceleration_y;
 
-        if(keys[GLFW_KEY_UP])
-            m_vecEntities[0].m_velocity_y -= m_vecEntities[0].m_acceleration_y;
+            if(keys[GLFW_KEY_UP])
+                m_vecEntities[0].m_velocity_y -= m_vecEntities[0].m_acceleration_y;
 
-        if(keys[GLFW_KEY_DOWN])
-            m_vecEntities[0].m_velocity_y += m_vecEntities[0].m_acceleration_y;
+            if(keys[GLFW_KEY_DOWN])
+                m_vecEntities[0].m_velocity_y += m_vecEntities[0].m_acceleration_y;
 
-        ///Horizontal movement
-        if(keys[GLFW_KEY_D])
-            m_vecEntities[0].m_velocity_x += m_vecEntities[0].m_acceleration_x;
+            ///Horizontal movement
+            if(keys[GLFW_KEY_D])
+                m_vecEntities[0].m_velocity_x += m_vecEntities[0].m_acceleration_x;
 
-        if(keys[GLFW_KEY_A])
-            m_vecEntities[0].m_velocity_x -= m_vecEntities[0].m_acceleration_x;
+            if(keys[GLFW_KEY_A])
+                m_vecEntities[0].m_velocity_x -= m_vecEntities[0].m_acceleration_x;
 
-        if(keys[GLFW_KEY_RIGHT])
-            m_vecEntities[0].m_velocity_x += m_vecEntities[0].m_acceleration_x;
+            if(keys[GLFW_KEY_RIGHT])
+                m_vecEntities[0].m_velocity_x += m_vecEntities[0].m_acceleration_x;
 
-        if(keys[GLFW_KEY_LEFT])
-            m_vecEntities[0].m_velocity_x -= m_vecEntities[0].m_acceleration_x;
+            if(keys[GLFW_KEY_LEFT])
+                m_vecEntities[0].m_velocity_x -= m_vecEntities[0].m_acceleration_x;
 
-        if(keys[GLFW_KEY_ENTER] || keys[GLFW_KEY_SPACE])
-            if(m_vecEntities[0].m_shoot_delay > 40)
-            {
-                Shoot(0, DIRECTION_RIGHT, 2);
-                m_vecEntities[0].m_shoot_delay = 0;
-            }
+            if(keys[GLFW_KEY_ENTER] || keys[GLFW_KEY_SPACE])
+                if(m_vecEntities[0].m_shoot_delay > 40)
+                {
+                    Shoot(0, DIRECTION_RIGHT, 2);
+                    m_vecEntities[0].m_shoot_delay = 0;
+                }
+        }
 
         ///Additional keys
         if(keys[GLFW_KEY_M])
@@ -326,6 +333,22 @@ namespace game
                 m_msaa = !m_msaa;
                 m_sleep_time = 0;
             }
+
+        if(keys[GLFW_KEY_ENTER])
+        {
+            if(m_game_over)
+            {
+                m_game_over = false;
+            }
+        }
+    }
+
+    void TGame::GameOver()
+    {
+        m_game_over = true;
+        m_is_running = false;
+        m_vecEntities.clear();
+        m_vecCollisions.clear();
     }
 
     void TGame::SpawnPlayer()
@@ -349,6 +372,7 @@ namespace game
 
     void TGame::EnemyAI()
     {
+        m_current_enemy_count = 0;
         for(int i = 0; i < m_vecEntities.size(); i++)
         {
             if(m_vecEntities[i].m_type == ENEMY)
@@ -356,8 +380,11 @@ namespace game
                 m_vecEntities[i].m_shoot_timer++;
                 if(m_vecEntities[i].m_shoot_timer > 100)
                 {
-                    Shoot(i, DIRECTION_LEFT, 1);
-                    m_vecEntities[i].m_shoot_timer = 0;
+                    if(m_vecEntities[i].m_x <= m_window_width + m_vecEntities[i].m_width)
+                    {
+                        Shoot(i, DIRECTION_LEFT, 1);
+                        m_vecEntities[i].m_shoot_timer = 0;
+                    }
                 }
 
                 if(!m_vecEntities[i].m_task.m_is_active ||
@@ -411,8 +438,21 @@ namespace game
                         m_vecEntities[i].m_velocity_y = 0;
                     }
                 }
+                m_current_enemy_count++;
             }
         }
+    }
+
+    void TGame::Start()
+    {
+        m_vecEntities.clear();
+        m_vecCollisions.clear();
+        SpawnPlayer();
+        SpawnEnemies(2);
+        m_is_running = true;
+        m_game_over = false;
+        m_current_wave = 1;
+        m_current_enemy_count = 3 + int(m_current_wave / 2);
     }
 
     void TGame::Update(float delta_time)
@@ -422,142 +462,168 @@ namespace game
         m_vecCollisions.clear();
         m_sleep_time++;
 
-        EnemyAI();
-
-        for(auto it = m_vecEntities.begin(); it != m_vecEntities.end(); it++)
+        if(m_is_running)
         {
-            it->m_shoot_delay++;
-            if(it->m_life_time != -1)
-                it->m_life_time++;
-
-            if(
-               ((it->m_type == BULLET) && (it->m_x > 2000)) ||
-               ((it->m_type == BULLET) && (it->m_did_hit)) ||
-               ((it->m_type == ENEMY) && (it->m_x < 0 - it->m_width)) ||
-               ((it->m_life_time != -1) && (it->m_life_time > it->m_max_life_time)) ||
-               ((it->m_is_destroyed) || (it->m_current_life <= 0))
-              )
+            if(m_vecEntities[0].m_current_life <= 0)
             {
-                m_vecEntities.erase(it);
-                it--;
+                GameOver();
+                return;
             }
-        }
 
-        if(m_vecEntities[0].m_y < 0)
-        {
-            m_vecEntities[0].m_y = 1;
-            m_vecEntities[0].m_velocity_y = 0;
-        }
-
-        if(m_vecEntities[0].m_y > m_window_height - m_vecEntities[0].m_height)
-        {
-            m_vecEntities[0].m_y = m_window_height - m_vecEntities[0].m_height - 1;
-            m_vecEntities[0].m_velocity_y = 0;
-        }
-
-        if(m_vecEntities[0].m_x < 0)
-        {
-            m_vecEntities[0].m_x = 1;
-            m_vecEntities[0].m_velocity_x = 0;
-        }
-
-        if(m_vecEntities[0].m_x + m_vecEntities[0].m_width > m_window_width)
-        {
-            m_vecEntities[0].m_x = m_window_width - m_vecEntities[0].m_width;
-            m_vecEntities[0].m_velocity_x = 0;
-        }
-
-        ///Looking for border collision
-        for(int i = 0; i < 4; i++)
-        {
-            if(FindBorderCollisionPC(i, delta_time))
+            EnemyAI();
+            if(m_current_enemy_count == 0)
             {
-                collision temp_collision(0, 666+i, 0);
-                m_vecCollisions.push_back(temp_collision);
-                m_collision_flag = true;
+                m_current_wave++;
+                SpawnEnemies(3 + int(m_current_wave / 2));
             }
-        }
 
-        int ecount = m_vecEntities.size();
-
-        ///Looking for Collision
-        for(unsigned int i = 0; i < m_vecEntities.size(); i++)
-        {
-            for(unsigned int j = i + 1; j < m_vecEntities.size(); j++)
+            for(auto it = m_vecEntities.begin(); it != m_vecEntities.end(); it++)
             {
-                if(FindForwardCollisionPC(i, j, delta_time))
+                it->m_shoot_delay++;
+                if(it->m_life_time != -1)
+                    it->m_life_time++;
+
+                if(
+                   ((it->m_type == BULLET) && (it->m_x > 2000)) ||
+                   ((it->m_type == BULLET) && (it->m_did_hit)) ||
+                   ((it->m_type == ENEMY) && (it->m_x < 0 - it->m_width)) ||
+                   ((it->m_life_time != -1) && (it->m_life_time > it->m_max_life_time)) ||
+                   ((it->m_is_destroyed) || (it->m_current_life <= 0))
+                  )
                 {
-                    collision temp_collision(i, j, 0);
+                    m_vecEntities.erase(it);
+                    it--;
+                }
+            }
+
+            if(m_vecEntities[0].m_y < 0)
+            {
+                m_vecEntities[0].m_y = 1;
+                m_vecEntities[0].m_velocity_y = 0;
+            }
+
+            if(m_vecEntities[0].m_y > m_window_height - m_vecEntities[0].m_height)
+            {
+                m_vecEntities[0].m_y = m_window_height - m_vecEntities[0].m_height - 1;
+                m_vecEntities[0].m_velocity_y = 0;
+            }
+
+            if(m_vecEntities[0].m_x < 0)
+            {
+                m_vecEntities[0].m_x = 1;
+                m_vecEntities[0].m_velocity_x = 0;
+            }
+
+            if(m_vecEntities[0].m_x + m_vecEntities[0].m_width > m_window_width)
+            {
+                m_vecEntities[0].m_x = m_window_width - m_vecEntities[0].m_width;
+                m_vecEntities[0].m_velocity_x = 0;
+            }
+
+            ///Looking for border collision
+            for(int i = 0; i < 4; i++)
+            {
+                if(FindBorderCollisionPC(i, delta_time))
+                {
+                    collision temp_collision(0, 666+i, 0);
                     m_vecCollisions.push_back(temp_collision);
                     m_collision_flag = true;
                 }
             }
-        }
 
-        ///Collision Processing (Borders)
-        for(auto it = m_vecCollisions.begin(); it != m_vecCollisions.end(); it++)
-        {
-           if((it->eID_1 >= 666) || (it->eID_2 >= 666))
-           {
-               if(it->eID_1 >= 666)
-               {
-                   m_vecEntities[it->eID_2].m_velocity_x = -m_vecEntities[it->eID_2].m_velocity_x;
-                   m_vecEntities[it->eID_2].m_velocity_y = -m_vecEntities[it->eID_2].m_velocity_y;
-               }
+            int ecount = m_vecEntities.size();
 
-               if(it->eID_2 >= 666)
-               {
-                   m_vecEntities[it->eID_1].m_velocity_x = -m_vecEntities[it->eID_1].m_velocity_x;
-                   m_vecEntities[it->eID_1].m_velocity_y = -m_vecEntities[it->eID_1].m_velocity_y;
-               }
-           }
-        }
-
-        ///Collision processing (entities)
-        for(auto it = m_vecCollisions.begin(); it != m_vecCollisions.end(); it++)
-        {
-            if(it->eID_2 < 666 && it->eID_1 < 666)
+            ///Looking for Collision
+            for(unsigned int i = 0; i < m_vecEntities.size(); i++)
             {
-                if(m_vecEntities[it->eID_1].m_type == BULLET)
+                for(unsigned int j = i + 1; j < m_vecEntities.size(); j++)
                 {
-                    if(m_vecEntities[it->eID_2].m_type != BULLET)
+                    if(FindForwardCollisionPC(i, j, delta_time))
                     {
-                        if(!m_vecEntities[it->eID_1].m_did_hit && m_vecEntities[it->eID_1].m_bullet_owner_id != it->eID_2)
-                        {
-                            m_vecEntities[it->eID_2].m_current_life -= 3;
-                            m_vecEntities[it->eID_1].m_did_hit = true;
-                        }
+                        collision temp_collision(i, j, 0);
+                        m_vecCollisions.push_back(temp_collision);
+                        m_collision_flag = true;
                     }
-                }
-
-                if(m_vecEntities[it->eID_2].m_type == BULLET)
-                {
-                    if(m_vecEntities[it->eID_1].m_type != BULLET)
-                    {
-                        if(!m_vecEntities[it->eID_2].m_did_hit && m_vecEntities[it->eID_2].m_bullet_owner_id != it->eID_1)
-                        {
-                            m_vecEntities[it->eID_1].m_current_life -= 5;
-                            m_vecEntities[it->eID_2].m_did_hit = true;
-                        }
-                    }
-                }
-
-                if(it->eID_2 == 0 || it->eID_1 == 0)
-                {
-                    m_vecEntities[0].m_velocity_x = -m_vecEntities[0].m_velocity_x;
-                    m_vecEntities[0].m_velocity_y = -m_vecEntities[0].m_velocity_y;
                 }
             }
-        }
 
-        ///Position Processing
-        for(auto ent = m_vecEntities.begin(); ent != m_vecEntities.end(); ent++)
-        {
-            ent->m_velocity_x = ent->m_velocity_x - ent->m_velocity_x * DECIPATON;
-            ent->m_velocity_y = ent->m_velocity_y - ent->m_velocity_y * DECIPATON;
+            ///Collision Processing (Borders)
+            for(auto it = m_vecCollisions.begin(); it != m_vecCollisions.end(); it++)
+            {
+               if((it->eID_1 >= 666) || (it->eID_2 >= 666))
+               {
+                   if(it->eID_1 >= 666)
+                   {
+                       m_vecEntities[it->eID_2].m_velocity_x = -m_vecEntities[it->eID_2].m_velocity_x;
+                       m_vecEntities[it->eID_2].m_velocity_y = -m_vecEntities[it->eID_2].m_velocity_y;
+                   }
 
-            ent->m_x += ent->m_velocity_x * delta_time;
-            ent->m_y += ent->m_velocity_y * delta_time;
+                   if(it->eID_2 >= 666)
+                   {
+                       m_vecEntities[it->eID_1].m_velocity_x = -m_vecEntities[it->eID_1].m_velocity_x;
+                       m_vecEntities[it->eID_1].m_velocity_y = -m_vecEntities[it->eID_1].m_velocity_y;
+                   }
+               }
+            }
+
+            ///Collision processing (entities)
+            for(auto it = m_vecCollisions.begin(); it != m_vecCollisions.end(); it++)
+            {
+                if(it->eID_2 < 666 && it->eID_1 < 666)
+                {
+                    if(m_vecEntities[it->eID_1].m_type == BULLET)
+                    {
+                        if(m_vecEntities[it->eID_2].m_type != BULLET)
+                        {
+                            if(!m_vecEntities[it->eID_1].m_did_hit && m_vecEntities[it->eID_1].m_bullet_owner_id != it->eID_2)
+                            {
+                                m_vecEntities[it->eID_2].m_current_life -= 3;
+                                m_vecEntities[it->eID_1].m_did_hit = true;
+                                if(it->eID_2 != 0 && m_vecEntities[it->eID_1].m_bullet_owner_id == 0)
+                                {
+                                    m_score += 3;
+                                    if(m_vecEntities[it->eID_2].m_current_life <= 0)
+                                        m_score += 10;
+                                }
+                            }
+                        }
+                    }
+
+                    if(m_vecEntities[it->eID_2].m_type == BULLET)
+                    {
+                        if(m_vecEntities[it->eID_1].m_type != BULLET)
+                        {
+                            if(!m_vecEntities[it->eID_2].m_did_hit && m_vecEntities[it->eID_2].m_bullet_owner_id != it->eID_1)
+                            {
+                                m_vecEntities[it->eID_1].m_current_life -= 5;
+                                m_vecEntities[it->eID_2].m_did_hit = true;
+                                if(it->eID_1 != 0 && m_vecEntities[it->eID_2].m_bullet_owner_id == 0)
+                                {
+                                    m_score += 3;
+                                    if(m_vecEntities[it->eID_1].m_current_life <= 0)
+                                        m_score += 10;
+                                }
+                            }
+                        }
+                    }
+
+                    if(it->eID_2 == 0 || it->eID_1 == 0)
+                    {
+                        m_vecEntities[0].m_velocity_x = -m_vecEntities[0].m_velocity_x;
+                        m_vecEntities[0].m_velocity_y = -m_vecEntities[0].m_velocity_y;
+                    }
+                }
+            }
+
+            ///Position Processing
+            for(auto ent = m_vecEntities.begin(); ent != m_vecEntities.end(); ent++)
+            {
+                ent->m_velocity_x = ent->m_velocity_x - ent->m_velocity_x * DECIPATON;
+                ent->m_velocity_y = ent->m_velocity_y - ent->m_velocity_y * DECIPATON;
+
+                ent->m_x += ent->m_velocity_x * delta_time;
+                ent->m_y += ent->m_velocity_y * delta_time;
+            }
         }
     }
 }

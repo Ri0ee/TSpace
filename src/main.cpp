@@ -69,15 +69,27 @@ float background_shift;
 
 ///BEGIN
 
+void HideGUI()
+{
+    std::cout << "GUI hidden" << std::endl;
+    guilib.m_visible = false;
+}
+
+void ShowGUI()
+{
+    std::cout << "GUI shown" << std::endl;
+    guilib.m_visible = true;
+}
+
 void GameplayRender()
 {
     graphics::DrawTexture(vec2(0 - background_shift, 0), window_width, window_height, resmngr.m_game_textures["sprite_background"], false);
     graphics::DrawTexture(vec2(window_width - background_shift, 0), window_width, window_height, resmngr.m_game_textures["sprite_background"], false);
 
-    Game.m_vecBorderMeshes[0].Draw(0 - background_shift, 0);
-    Game.m_vecBorderMeshes[1].Draw(window_width - background_shift, 0);
-    Game.m_vecBorderMeshes[2].Draw(0 - background_shift, window_height - BORDER_MESH_BOUND_Y * 2 - 20);
-    Game.m_vecBorderMeshes[3].Draw(window_width - background_shift, window_height - BORDER_MESH_BOUND_Y * 2 - 20);
+    Game.m_vecBorderMeshes[0].Draw(0 - background_shift, 0, BORDER);
+    Game.m_vecBorderMeshes[1].Draw(window_width - background_shift, 0, BORDER);
+    Game.m_vecBorderMeshes[2].Draw(0 - background_shift, window_height - BORDER_MESH_BOUND_Y * 2 - 20, BORDER);
+    Game.m_vecBorderMeshes[3].Draw(window_width - background_shift, window_height - BORDER_MESH_BOUND_Y * 2 - 20, BORDER);
 
     background_shift++;
     if(background_shift == window_width)
@@ -91,25 +103,54 @@ void GameplayRender()
 
     Game.m_border_shift = background_shift;
 
-    for(auto it = Game.m_vecEntities.begin(); it != Game.m_vecEntities.end(); it++)
+    if(Game.m_game_over)
     {
-        graphics::DrawTexture(vec2(it->m_x, it->m_y),
-                              it->m_width,
-                              it->m_height,
-                              resmngr.m_game_textures[it->m_sprite_name],
-                              true,
-                              it->m_vecPolygon[0].m_color);
+        freetype::textinf string_info, string_info_2;
+        string_info.font_size = 30;
+        string_info_2.font_size = 25;
+        ftlib.GetTextInfo("GAME OVER", 30, &string_info);
+        ftlib.GetTextInfo("Press enter to continue", 25, &string_info_2);
 
-        if(it->m_type == PLAYER || it->m_type == ENEMY)
+        TPolygon nice_border(100, 100, 100, 100);
+        nice_border.addVertex(0, 0);
+        nice_border.addVertex(string_info_2.width, 0);
+        nice_border.addVertex(string_info_2.width, 100);
+        nice_border.addVertex(0, 100);
+        nice_border.Draw((window_width - string_info_2.width) / 2, window_height / 2 - 50, FILLED);
+
+        graphics::ftDrawText("GAME OVER", color{0, 255, 255, 100}, vec2((window_width - string_info.width) / 2, (window_height - string_info.height) / 2), 30, ftlib);
+        graphics::ftDrawText("Press enter to continue", color{0, 255, 255, 100}, vec2((window_width - string_info_2.width) / 2, (window_height + string_info_2.height + 30) / 2), 25, ftlib);
+    }
+
+    if(Game.m_is_running)
+    {
+        for(auto it = Game.m_vecEntities.begin(); it != Game.m_vecEntities.end(); it++)
         {
-            float width = it->m_width / it->m_maximum_life * it->m_current_life;
+            graphics::DrawTexture(vec2(it->m_x, it->m_y),
+                                  it->m_width,
+                                  it->m_height,
+                                  resmngr.m_game_textures[it->m_sprite_name],
+                                  true,
+                                  it->m_vecPolygon[0].m_color);
 
-            TPolygon health_bar(255, 255, 255, 100);
-            health_bar.addVertex(0, 0);
-            health_bar.addVertex(width, 0);
-            health_bar.addVertex(width, 5);
-            health_bar.addVertex(0, 5);
-            health_bar.Draw(it->m_x, it->m_y - 7);
+            if(it->m_type == PLAYER || it->m_type == ENEMY)
+            {
+                float width = it->m_width / it->m_maximum_life * it->m_current_life;
+
+                TPolygon health_bar(255, 255, 255, 100);
+                health_bar.addVertex(0, 0);
+                health_bar.addVertex(width, 0);
+                health_bar.addVertex(width, 5);
+                health_bar.addVertex(0, 5);
+                health_bar.Draw(it->m_x, it->m_y - 7, FILLED);
+            }
+        }
+    }
+    else
+    {
+        if(!guilib.m_visible && !Game.m_game_over)
+        {
+            ShowGUI();
         }
     }
 }
@@ -156,33 +197,22 @@ void Render()
 
     color text_color{255, 255, 0, 100};
     graphics::ftDrawText("Fps: " + to_string(FPS), text_color, vec2(0, 10), 10, ftlib);
-    graphics::ftDrawText((Game.m_collision_flag?"collision: yes":"collision: no"), text_color, vec2(0, 21), 10, ftlib);
-    graphics::ftDrawText("Depth: " + to_string(Game.m_collsion_depth), text_color, vec2(0, 32), 10, ftlib);
-    graphics::ftDrawText("Mouse pos: (" + to_string(mouse_pos.a) + ";" + to_string(mouse_pos.b) + ")", text_color, vec2(0, 44), 10, ftlib);
-    graphics::ftDrawText("Player pos: (" + to_string(Game.m_vecEntities[0].m_x) + ";" + to_string(Game.m_vecEntities[0].m_y) + ")", text_color, vec2(0, 55), 10, ftlib);
-    graphics::ftDrawText("Enemy pos: (" + to_string(Game.m_vecEntities[1].m_x) + ";" + to_string(Game.m_vecEntities[1].m_y) + ")", text_color, vec2(0, 66), 10, ftlib);
-    graphics::ftDrawText("Entity count: " + to_string((int)Game.m_vecEntities.size()), text_color, vec2(0, 78), 10, ftlib);
-    graphics::ftDrawText("Entity[1] velocity_x: " + to_string((int)Game.m_vecEntities[1].m_velocity_x), text_color, vec2(0, 89), 10, ftlib);
+    //graphics::ftDrawText((Game.m_collision_flag?"collision: yes":"collision: no"), text_color, vec2(0, 21), 10, ftlib);
+    //graphics::ftDrawText("Depth: " + to_string(Game.m_collsion_depth), text_color, vec2(0, 32), 10, ftlib);
+    //graphics::ftDrawText("Mouse pos: (" + to_string(mouse_pos.a) + ";" + to_string(mouse_pos.b) + ")", text_color, vec2(0, 44), 10, ftlib);
+    //graphics::ftDrawText("Player pos: (" + to_string(Game.m_vecEntities[0].m_x) + ";" + to_string(Game.m_vecEntities[0].m_y) + ")", text_color, vec2(0, 55), 10, ftlib);
+    //graphics::ftDrawText("Enemy pos: (" + to_string(Game.m_vecEntities[1].m_x) + ";" + to_string(Game.m_vecEntities[1].m_y) + ")", text_color, vec2(0, 66), 10, ftlib);
+    //graphics::ftDrawText("Entity count: " + to_string((int)Game.m_vecEntities.size()), text_color, vec2(0, 78), 10, ftlib);
+    //graphics::ftDrawText("Entity[1] velocity_x: " + to_string((int)Game.m_vecEntities[1].m_velocity_x), text_color, vec2(0, 89), 10, ftlib);
 
     glfwSwapBuffers(window);
-}
-
-void HideGUI()
-{
-    std::cout << "GUI hidden" << std::endl;
-    guilib.m_visible = false;
-}
-
-void ShowGUI()
-{
-    std::cout << "GUI shown" << std::endl;
-    guilib.m_visible = true;
 }
 
 void Start_button_callback()
 {
     cout << "Callback function called\n";
     HideGUI();
+    Game.Start();
 }
 
 void Exit_button_callback()

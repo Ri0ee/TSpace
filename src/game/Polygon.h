@@ -24,7 +24,7 @@ class TPolygon
         void PrintVerticesOut();
         void addVertex(vec2 vertex);
         void addVertex(float x, float y);
-        void Draw(float x0, float y0);
+        void Draw(float x0, float y0, int draw_mode);
 
         bool FindForwardCollsionMinkowski(TPolygon second_polygon, float &penetrationDepth);
         bool FindForwardCollsionPC(TPolygon second_polygon);

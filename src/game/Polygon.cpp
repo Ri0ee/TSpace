@@ -39,7 +39,7 @@ void TPolygon::addVertex(float x, float y)
     m_vec_vertex.m_vec_vertex.push_back(vec2(x, y));
 }
 
-void TPolygon::Draw(float X0, float Y0)
+void TPolygon::Draw(float x0, float y0, int draw_mode)
 {
     TPPLPartition pp;
     TPPLPoly temp_polygon;
@@ -59,7 +59,12 @@ void TPolygon::Draw(float X0, float Y0)
         std::vector<vec2> temp_vector;
         for(int i = 0; i < it->GetNumPoints(); i++)
             temp_vector.push_back(vec2(it->GetPoint(i).x, it->GetPoint(i).y));
-        graphics::DrawPolygon(temp_vector, m_color, vec2(X0, Y0), false, 2);
+
+        if(draw_mode == FILLED)
+            graphics::DrawPolygon(temp_vector, m_color, vec2(x0, y0), false, 1);
+
+        if(draw_mode == BORDER)
+            graphics::DrawPolygon(temp_vector, m_color, vec2(x0, y0), false, 2);
     }
 }
 

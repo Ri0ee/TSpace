@@ -66,6 +66,9 @@ namespace game
             void SpawnEnemy(int for_random);
             void SpawnEnemies(int ammount);
 
+            void Start();
+            void GameOver();
+
             vector<TGameEntity> m_vecEntities;
             vector<collision> m_vecCollisions;
             vector<TPolygon> m_vecBorderMeshes;
@@ -88,6 +91,12 @@ namespace game
 
             bool m_game_over;
             bool m_enemy_spawn_state;
+            bool m_is_running;
+
+            int m_current_wave;
+            int m_current_enemy_count;
+
+            float m_score;
 
             TPolygon bullet_shape;
             TPolygon bullet_shape_2;

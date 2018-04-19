@@ -55,7 +55,7 @@ void TGameEntity::AddShape(TPolygon polygon)
 void TGameEntity::Draw()
 {
     for(auto it = m_vecPolygon.begin(); it != m_vecPolygon.end(); it++)
-        it->Draw(m_x, m_y);
+        it->Draw(m_x, m_y, FILLED);
 }
 
 void TGameEntity::FindBoudaries()
