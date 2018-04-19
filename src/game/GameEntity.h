@@ -13,8 +13,21 @@
 #define ENEMY 1
 #define BULLET 2
 
+#define TASK_MOVE 1
+#define TASK_STAY 2
+
 using std::vector;
 using std::string;
+
+struct Task
+{
+    float m_maximum_duration;
+    float m_current_duration;
+    int m_type;
+    float m_ax, m_ay;
+    float m_x, m_y;
+    bool m_is_active;
+};
 
 class TGameEntity
 {
@@ -51,6 +64,10 @@ class TGameEntity
 
         bool m_is_destroyed;
         bool m_did_hit;
+
+        int m_bullet_owner_id;
+
+        Task m_task;
 
         vector<TPolygon> m_vecPolygon;
 };

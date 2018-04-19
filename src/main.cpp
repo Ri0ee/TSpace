@@ -162,6 +162,7 @@ void Render()
     graphics::ftDrawText("Player pos: (" + to_string(Game.m_vecEntities[0].m_x) + ";" + to_string(Game.m_vecEntities[0].m_y) + ")", text_color, vec2(0, 55), 10, ftlib);
     graphics::ftDrawText("Enemy pos: (" + to_string(Game.m_vecEntities[1].m_x) + ";" + to_string(Game.m_vecEntities[1].m_y) + ")", text_color, vec2(0, 66), 10, ftlib);
     graphics::ftDrawText("Entity count: " + to_string((int)Game.m_vecEntities.size()), text_color, vec2(0, 78), 10, ftlib);
+    graphics::ftDrawText("Entity[1] velocity_x: " + to_string((int)Game.m_vecEntities[1].m_velocity_x), text_color, vec2(0, 89), 10, ftlib);
 
     glfwSwapBuffers(window);
 }
@@ -200,13 +201,11 @@ void InitGUI()
     vertex.push_back(vec2(0, 0));    vertex.push_back(vec2(300, 0));
     vertex.push_back(vec2(300, 40)); vertex.push_back(vec2(50, 40));
     TButton button_1(vertex, vec2(window_width - 300, 10), 2, btncolor, fg_btncolor, hl_btncolor, "Start", &ftlib);
-    TButton button_2(vertex, vec2(window_width - 300, 80), 2, btncolor, fg_btncolor, hl_btncolor, "Upgrade", &ftlib);
-    TButton button_3(vertex, vec2(window_width - 300, 150), 2, btncolor, fg_btncolor, hl_btncolor, "Exit", &ftlib);
+    TButton button_2(vertex, vec2(window_width - 300, 80), 2, btncolor, fg_btncolor, hl_btncolor, "Exit", &ftlib);
     button_1.SetCallback(Start_button_callback);
-    button_3.SetCallback(Exit_button_callback);
+    button_2.SetCallback(Exit_button_callback);
     guilib.AddButton(button_1);
     guilib.AddButton(button_2);
-    guilib.AddButton(button_3);
     guilib.m_visible = true;
 }
 
@@ -256,7 +255,7 @@ void InitEverything()
     glfwWindowHint(GLFW_VISIBLE, GL_TRUE);
 
     window = glfwCreateWindow(window_width, window_height, window_name, 0, 0);
-    glfwSetWindowPos(window, 100, 30);
+    glfwSetWindowPos(window, 5, 50);
 
     if(window == 0)
     {

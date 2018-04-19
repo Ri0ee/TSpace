@@ -28,24 +28,31 @@ namespace game
         m_window_width = window_width;
         m_window_height = window_height;
 
-        TPolygon Triangle(255, 255, 255, 100);
-        Triangle.addVertex(0, 0);
-        Triangle.addVertex(50, 25);
-        Triangle.addVertex(0, 50);
-        AddEntity(TGameEntity(PLAYER, "sprite_ship", Triangle, vec2(10, window_height / 2 - 25), vec2(10, 10), -1, 0));
-
-        TPolygon Square(255, 0, 0, 100);
-        Square.addVertex(0, 0);
-        Square.addVertex(50, 0);
-        Square.addVertex(50, 50);
-        Square.addVertex(0, 50);
-        AddEntity(TGameEntity(ENEMY, "sprite_enemy_1", Square, vec2(500, 200), vec2(10, 10), -1, 0));
-
         bullet_shape.m_color = color{255, 0, 0, 100};
         bullet_shape.addVertex(0, 0);
         bullet_shape.addVertex(50, 0);
         bullet_shape.addVertex(50, 5);
         bullet_shape.addVertex(0, 5);
+
+        bullet_shape_2.m_color = color{0, 0, 255, 100};
+        bullet_shape_2.addVertex(0, 0);
+        bullet_shape_2.addVertex(50, 0);
+        bullet_shape_2.addVertex(50, 5);
+        bullet_shape_2.addVertex(0, 5);
+
+        player_shape.m_color = color{255, 255, 255, 100};
+        player_shape.addVertex(0, 0);
+        player_shape.addVertex(50, 25);
+        player_shape.addVertex(0, 50);
+
+        enemy_shape.m_color = color{255, 0, 0, 100};
+        enemy_shape.addVertex(0, 0);
+        enemy_shape.addVertex(50, 0);
+        enemy_shape.addVertex(50, 50);
+        enemy_shape.addVertex(0, 50);
+
+        SpawnPlayer();
+        SpawnEnemies(3);
 
         m_vecBorderMeshes[0] = GenerateBorderMesh(true);
         m_vecBorderMeshes[1] = GenerateBorderMesh(true);
@@ -231,20 +238,47 @@ namespace game
 
     void TGame::Shoot(int shooter_entity_id, int direction, int ammount)
     {
+        float bullet_shift;
+        if(ammount == 1)
+            bullet_shift = m_vecEntities[shooter_entity_id].m_height / 2;
+        if(ammount == 2)
+            bullet_shift = m_vecEntities[shooter_entity_id].m_height;
+
         for(int i = 0; i < ammount; i++)
         {
-            float bullet_shift = m_vecEntities[shooter_entity_id].m_height / (ammount + 1) - 3;
             if(direction == DIRECTION_LEFT)
             {
-                TGameEntity bullet(BULLET, "sprite_bullet", bullet_shape, vec2(m_vecEntities[shooter_entity_id].m_x - 30, m_vecEntities[shooter_entity_id].m_y + bullet_shift * i), vec2(0, 0), 0, 100);
-                bullet.m_velocity_x = -BULLET_VELOCITY;
-                AddEntity(bullet);
+                if(shooter_entity_id == 0)
+                {
+                    TGameEntity bullet(BULLET, "sprite_bullet", bullet_shape_2, vec2(m_vecEntities[shooter_entity_id].m_x - 30, m_vecEntities[shooter_entity_id].m_y + bullet_shift * (i + 1)), vec2(0, 0), 0, 100);
+                    bullet.m_velocity_x = -BULLET_VELOCITY;
+                    bullet.m_bullet_owner_id = shooter_entity_id;
+                    AddEntity(bullet);
+                }
+                else
+                {
+                    TGameEntity bullet(BULLET, "sprite_bullet", bullet_shape, vec2(m_vecEntities[shooter_entity_id].m_x - 30, m_vecEntities[shooter_entity_id].m_y + bullet_shift * (i + 1)), vec2(0, 0), 0, 100);
+                    bullet.m_velocity_x = -BULLET_VELOCITY;
+                    bullet.m_bullet_owner_id = shooter_entity_id;
+                    AddEntity(bullet);
+                }
             }
             if(direction == DIRECTION_RIGHT)
             {
-                TGameEntity bullet(BULLET, "sprite_bullet", bullet_shape, vec2(m_vecEntities[shooter_entity_id].m_x + m_vecEntities[shooter_entity_id].m_width + 1, m_vecEntities[shooter_entity_id].m_y + bullet_shift * i), vec2(0, 0), 0, 100);
-                bullet.m_velocity_x = BULLET_VELOCITY;
-                AddEntity(bullet);
+                if(shooter_entity_id == 0)
+                {
+                    TGameEntity bullet(BULLET, "sprite_bullet", bullet_shape_2, vec2(m_vecEntities[shooter_entity_id].m_x + m_vecEntities[shooter_entity_id].m_width + 1, m_vecEntities[shooter_entity_id].m_y + bullet_shift * i), vec2(0, 0), 0, 100);
+                    bullet.m_velocity_x = BULLET_VELOCITY;
+                    bullet.m_bullet_owner_id = shooter_entity_id;
+                    AddEntity(bullet);
+                }
+                else
+                {
+                    TGameEntity bullet(BULLET, "sprite_bullet", bullet_shape, vec2(m_vecEntities[shooter_entity_id].m_x + m_vecEntities[shooter_entity_id].m_width + 1, m_vecEntities[shooter_entity_id].m_y + bullet_shift * i), vec2(0, 0), 0, 100);
+                    bullet.m_velocity_x = BULLET_VELOCITY;
+                    bullet.m_bullet_owner_id = shooter_entity_id;
+                    AddEntity(bullet);
+                }
             }
         }
         m_shaking_rating++;
@@ -279,7 +313,7 @@ namespace game
             m_vecEntities[0].m_velocity_x -= m_vecEntities[0].m_acceleration_x;
 
         if(keys[GLFW_KEY_ENTER] || keys[GLFW_KEY_SPACE])
-            if(m_vecEntities[0].m_shoot_delay > 20)
+            if(m_vecEntities[0].m_shoot_delay > 40)
             {
                 Shoot(0, DIRECTION_RIGHT, 2);
                 m_vecEntities[0].m_shoot_delay = 0;
@@ -294,6 +328,25 @@ namespace game
             }
     }
 
+    void TGame::SpawnPlayer()
+    {
+        AddEntity(TGameEntity(PLAYER, "sprite_ship", player_shape, vec2(10, m_window_height / 2 - 25), vec2(10, 10), -1, 0));
+    }
+
+    void TGame::SpawnEnemy(int for_random)
+    {
+        srand(GetTime() * for_random);
+        AddEntity(TGameEntity(ENEMY, "sprite_enemy_1", enemy_shape, vec2(m_window_width + 60 + rand() % 300, m_window_height / 2 + (rand() % 400 - 100)), vec2(10, 10), -1, 0));
+    }
+
+    void TGame::SpawnEnemies(int ammount)
+    {
+        for(int i = 0; i < ammount; i++)
+        {
+            SpawnEnemy(i);
+        }
+    }
+
     void TGame::EnemyAI()
     {
         for(int i = 0; i < m_vecEntities.size(); i++)
@@ -305,6 +358,58 @@ namespace game
                 {
                     Shoot(i, DIRECTION_LEFT, 1);
                     m_vecEntities[i].m_shoot_timer = 0;
+                }
+
+                if(!m_vecEntities[i].m_task.m_is_active ||
+                   m_vecEntities[i].m_task.m_current_duration >= m_vecEntities[i].m_task.m_maximum_duration)
+                {
+                    srand(GetTime() * i);
+                    if(rand() % 2 == 1)
+                    {
+                        m_vecEntities[i].m_task.m_type = TASK_MOVE;
+                        m_vecEntities[i].m_task.m_maximum_duration = rand() % 100 + 10;
+                        m_vecEntities[i].m_task.m_current_duration = 0;
+                        m_vecEntities[i].m_task.m_ax = -(rand() % 6 + 1);
+                        if(rand() % 2 == 1)
+                        {
+                            if(m_vecEntities[i].m_y < m_window_height - 200)
+                                m_vecEntities[i].m_task.m_ay = rand() % 6 + 1;
+                        }
+                        else
+                        {
+                            if(m_vecEntities[i].m_y > 300)
+                                m_vecEntities[i].m_task.m_ay = -(rand() % 6 + 1);
+                        }
+                    }
+                    else
+                    {
+                        m_vecEntities[i].m_task.m_type = TASK_STAY;
+                        m_vecEntities[i].m_task.m_maximum_duration = rand() % 100 + 10;
+                        m_vecEntities[i].m_task.m_current_duration = 0;
+                        m_vecEntities[i].m_task.m_ax = 0;
+                        m_vecEntities[i].m_task.m_ay = 0;
+                    }
+
+                    m_vecEntities[i].m_task.m_is_active = true;
+                }
+
+                if(m_vecEntities[i].m_task.m_is_active)
+                {
+                    m_vecEntities[i].m_task.m_current_duration++;
+                    if(m_vecEntities[i].m_task.m_current_duration == m_vecEntities[i].m_task.m_maximum_duration)
+                        m_vecEntities[i].m_task.m_is_active = false;
+
+                    if(m_vecEntities[i].m_task.m_type == TASK_MOVE)
+                    {
+                        m_vecEntities[i].m_velocity_x += m_vecEntities[i].m_task.m_ax;
+                        m_vecEntities[i].m_velocity_y += m_vecEntities[i].m_task.m_ay;
+                    }
+
+                    if(m_vecEntities[i].m_task.m_type == TASK_STAY)
+                    {
+                        m_vecEntities[i].m_velocity_x = 0;
+                        m_vecEntities[i].m_velocity_y = 0;
+                    }
                 }
             }
         }
@@ -328,6 +433,7 @@ namespace game
             if(
                ((it->m_type == BULLET) && (it->m_x > 2000)) ||
                ((it->m_type == BULLET) && (it->m_did_hit)) ||
+               ((it->m_type == ENEMY) && (it->m_x < 0 - it->m_width)) ||
                ((it->m_life_time != -1) && (it->m_life_time > it->m_max_life_time)) ||
                ((it->m_is_destroyed) || (it->m_current_life <= 0))
               )
@@ -391,10 +497,19 @@ namespace game
         ///Collision Processing (Borders)
         for(auto it = m_vecCollisions.begin(); it != m_vecCollisions.end(); it++)
         {
-           if((it->eID_2 == 0) && (it->eID_1 >= 666))
+           if((it->eID_1 >= 666) || (it->eID_2 >= 666))
            {
-               m_vecEntities[0].m_velocity_x = -m_vecEntities[0].m_velocity_x;
-               m_vecEntities[0].m_velocity_y = -m_vecEntities[0].m_velocity_y;
+               if(it->eID_1 >= 666)
+               {
+                   m_vecEntities[it->eID_2].m_velocity_x = -m_vecEntities[it->eID_2].m_velocity_x;
+                   m_vecEntities[it->eID_2].m_velocity_y = -m_vecEntities[it->eID_2].m_velocity_y;
+               }
+
+               if(it->eID_2 >= 666)
+               {
+                   m_vecEntities[it->eID_1].m_velocity_x = -m_vecEntities[it->eID_1].m_velocity_x;
+                   m_vecEntities[it->eID_1].m_velocity_y = -m_vecEntities[it->eID_1].m_velocity_y;
+               }
            }
         }
 
@@ -407,7 +522,7 @@ namespace game
                 {
                     if(m_vecEntities[it->eID_2].m_type != BULLET)
                     {
-                        if(!m_vecEntities[it->eID_1].m_did_hit)
+                        if(!m_vecEntities[it->eID_1].m_did_hit && m_vecEntities[it->eID_1].m_bullet_owner_id != it->eID_2)
                         {
                             m_vecEntities[it->eID_2].m_current_life -= 3;
                             m_vecEntities[it->eID_1].m_did_hit = true;
@@ -419,9 +534,9 @@ namespace game
                 {
                     if(m_vecEntities[it->eID_1].m_type != BULLET)
                     {
-                        if(!m_vecEntities[it->eID_2].m_did_hit)
+                        if(!m_vecEntities[it->eID_2].m_did_hit && m_vecEntities[it->eID_2].m_bullet_owner_id != it->eID_1)
                         {
-                            m_vecEntities[it->eID_1].m_current_life -= 3;
+                            m_vecEntities[it->eID_1].m_current_life -= 5;
                             m_vecEntities[it->eID_2].m_did_hit = true;
                         }
                     }

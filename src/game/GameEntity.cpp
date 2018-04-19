@@ -3,12 +3,10 @@
 TGameEntity::TGameEntity(int entity_type, const string& sprite_name, TPolygon polygon, vec2 position, vec2 acceleration, int life_time, int max_life_time)
 {
     m_sprite_name = sprite_name;
-    m_x = position.a;
-    m_y = position.b;
-    m_vecPolygon.push_back(polygon);
-
     m_type = entity_type;
 
+    m_x = position.a;
+    m_y = position.b;
     m_velocity_x = 0;
     m_velocity_y = 0;
     m_acceleration_x = acceleration.a;
@@ -26,6 +24,20 @@ TGameEntity::TGameEntity(int entity_type, const string& sprite_name, TPolygon po
 
     m_did_hit = false;
     m_is_destroyed = false;
+
+    m_task.m_is_active = false;
+    m_task.m_ax = 0;
+    m_task.m_ay = 0;
+    m_task.m_current_duration = 0;
+    m_task.m_maximum_duration = 100;
+    m_task.m_type = 0;
+    m_task.m_x = 0;
+    m_task.m_y = 0;
+
+    m_bullet_owner_id = -1;
+
+    m_vecPolygon.clear();
+    m_vecPolygon.push_back(polygon);
 
     FindBoudaries();
 }

@@ -62,6 +62,10 @@ namespace game
             bool FindForwardCollisionPC(int entity_1, int entity_2, float deltaTime);
             bool FindBorderCollisionPC(int border, float deltaTime);
 
+            void SpawnPlayer();
+            void SpawnEnemy(int for_random);
+            void SpawnEnemies(int ammount);
+
             vector<TGameEntity> m_vecEntities;
             vector<collision> m_vecCollisions;
             vector<TPolygon> m_vecBorderMeshes;
@@ -86,5 +90,8 @@ namespace game
             bool m_enemy_spawn_state;
 
             TPolygon bullet_shape;
+            TPolygon bullet_shape_2;
+            TPolygon player_shape;
+            TPolygon enemy_shape;
     };
 }
