@@ -7,6 +7,7 @@
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
+#include <bass.h>
 
 #include "BlurShader.h"
 #include "GlitchShader.h"
@@ -342,6 +343,13 @@ void InitEverything()
     ftlib.Init(current_dir, "Res\\Fontin-Regular.ttf");
     Game.Init(window_width, window_height);
     InitGUI();
+
+    BASS_Init(-1, 44100, 0, 0, NULL);
+    BASS_SetVolume(0.1);
+    string sound_dir = current_dir + "Res\\soundtrack.mp3";
+    HSAMPLE sample = BASS_SampleLoad(false, sound_dir.c_str(), 0, 0, 1, BASS_SAMPLE_MONO);
+    HCHANNEL channel = BASS_SampleGetChannel(sample, FALSE);
+    BASS_ChannelPlay(channel, FALSE);
 }
 
 int main(int argc, char **argv)
