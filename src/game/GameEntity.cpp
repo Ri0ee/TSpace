@@ -12,7 +12,13 @@ TGameEntity::TGameEntity(int entity_type, const string& sprite_name, TPolygon po
     m_acceleration_x = acceleration.a;
     m_acceleration_y = acceleration.b;
 
-    m_maximum_life = 100;
+    if(entity_type == PLAYER)
+        m_maximum_life = 200;
+    if(entity_type == ENEMY)
+        m_maximum_life = 50;
+    if(entity_type == BULLET)
+        m_maximum_life = 100;
+
     m_current_life = m_maximum_life;
     m_maximum_ammo = 30;
     m_current_ammo = m_maximum_ammo;

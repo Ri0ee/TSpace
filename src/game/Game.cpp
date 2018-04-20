@@ -19,6 +19,8 @@ namespace game
         m_is_running = false;
         m_current_wave = 1;
         m_current_enemy_count = 0;
+        m_score = 0;
+        m_best_score = 0;
     }
 
     TGame::~TGame()
@@ -349,6 +351,9 @@ namespace game
         m_is_running = false;
         m_vecEntities.clear();
         m_vecCollisions.clear();
+        if(m_score > m_best_score)
+            m_best_score = m_score;
+        m_score = 0;
     }
 
     void TGame::SpawnPlayer()

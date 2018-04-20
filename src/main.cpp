@@ -111,12 +111,12 @@ void GameplayRender()
         ftlib.GetTextInfo("GAME OVER", 30, &string_info);
         ftlib.GetTextInfo("Press enter to continue", 25, &string_info_2);
 
-        TPolygon nice_border(100, 100, 100, 100);
-        nice_border.addVertex(0, 0);
-        nice_border.addVertex(string_info_2.width, 0);
-        nice_border.addVertex(string_info_2.width, 100);
-        nice_border.addVertex(0, 100);
-        nice_border.Draw((window_width - string_info_2.width) / 2, window_height / 2 - 50, FILLED);
+//        TPolygon nice_border(100, 100, 100, 100);
+//        nice_border.addVertex(0, 0);
+//        nice_border.addVertex(string_info_2.width, 0);
+//        nice_border.addVertex(string_info_2.width, 100);
+//        nice_border.addVertex(0, 100);
+//        nice_border.Draw((window_width - string_info_2.width) / 2, window_height / 2 - 50, FILLED);
 
         graphics::ftDrawText("GAME OVER", color{0, 255, 255, 100}, vec2((window_width - string_info.width) / 2, (window_height - string_info.height) / 2), 30, ftlib);
         graphics::ftDrawText("Press enter to continue", color{0, 255, 255, 100}, vec2((window_width - string_info_2.width) / 2, (window_height + string_info_2.height + 30) / 2), 25, ftlib);
@@ -152,7 +152,8 @@ void GameplayRender()
         {
             ShowGUI();
         }
-        graphics::DrawTexture(vec2(0, 0), window_width, window_height, resmngr.m_game_textures["sprite_logo"], true, color{255, 255, 255, 100});
+        if(!Game.m_game_over)
+            graphics::DrawTexture(vec2(0, 0), window_width, window_height, resmngr.m_game_textures["sprite_logo"], true, color{255, 255, 255, 100});
     }
 }
 
@@ -196,8 +197,11 @@ void Render()
 
     guilib.Draw();
 
-    color text_color{255, 255, 0, 100};
-    graphics::ftDrawText("Fps: " + to_string(FPS), text_color, vec2(0, 10), 10, ftlib);
+    color text_color{0, 255, 255, 100};
+    graphics::ftDrawText("Score: " + to_string(Game.m_score), text_color, vec2(0, 30), 25, ftlib);
+    if(Game.m_best_score != 0)
+        graphics::ftDrawText("Best score: " + to_string(Game.m_best_score), text_color, vec2(0, 60), 25, ftlib);
+    //graphics::ftDrawText("Fps: " + to_string(FPS), text_color, vec2(0, 10), 10, ftlib);
     //graphics::ftDrawText((Game.m_collision_flag?"collision: yes":"collision: no"), text_color, vec2(0, 21), 10, ftlib);
     //graphics::ftDrawText("Depth: " + to_string(Game.m_collsion_depth), text_color, vec2(0, 32), 10, ftlib);
     //graphics::ftDrawText("Mouse pos: (" + to_string(mouse_pos.a) + ";" + to_string(mouse_pos.b) + ")", text_color, vec2(0, 44), 10, ftlib);

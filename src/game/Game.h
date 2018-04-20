@@ -97,6 +97,7 @@ namespace game
             int m_current_enemy_count;
 
             float m_score;
+            float m_best_score;
 
             TPolygon bullet_shape;
             TPolygon bullet_shape_2;
