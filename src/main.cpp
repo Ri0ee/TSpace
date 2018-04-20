@@ -152,6 +152,7 @@ void GameplayRender()
         {
             ShowGUI();
         }
+        graphics::DrawTexture(vec2(0, 0), window_width, window_height, resmngr.m_game_textures["sprite_logo"], true, color{255, 255, 255, 100});
     }
 }
 

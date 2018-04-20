@@ -26,6 +26,7 @@ void TResourceManager::LoadTextures()
     m_game_textures["sprite_bullet"] = m_texture_loader.GetTexture(m_current_dir + "Res\\Textures\\bullet.tga");
     m_game_textures["sprite_background"] = m_texture_loader.GetTexture(m_current_dir + "Res\\Textures\\background.tga");
     m_game_textures["sprite_enemy_1"] = m_texture_loader.GetTexture(m_current_dir + "Res\\Textures\\enemy_1.tga");
+    m_game_textures["sprite_logo"] = m_texture_loader.GetTexture(m_current_dir + "Res\\Textures\\logo.tga");
 }
 
 void TResourceManager::LoadShaders()

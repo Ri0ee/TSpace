@@ -34,3 +34,5 @@
 sprite_objects/
 *.layout
 *.depend
+*.docx
+*.pptx
