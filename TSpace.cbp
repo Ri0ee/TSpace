@@ -48,6 +48,7 @@
 		</Compiler>
 		<Linker>
 			<Add option="-static" />
+			<Add library="lib/bass.lib" />
 			<Add library="lib/libglew_static.a" />
 			<Add library="lib/libglfw3.a" />
 			<Add library="gdi32" />
