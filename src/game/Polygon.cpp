@@ -61,7 +61,7 @@ void TPolygon::Draw(float x0, float y0, int draw_mode)
             temp_vector.push_back(vec2(it->GetPoint(i).x, it->GetPoint(i).y));
 
         if(draw_mode == FILLED)
-            graphics::DrawPolygon(temp_vector, m_color, vec2(x0, y0), false, 1);
+            graphics::DrawPolygon(temp_vector, m_color, vec2(x0, y0), true, 1);
 
         if(draw_mode == BORDER)
             graphics::DrawPolygon(temp_vector, m_color, vec2(x0, y0), false, 2);

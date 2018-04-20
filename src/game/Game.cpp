@@ -6,21 +6,24 @@ namespace game
     TGame::TGame()
     {
         m_vecCollisions.clear();
+        m_vecParticles.clear();
+        m_vecBorderMeshes.clear();
+        m_vecEntities.clear();
+
         m_msaa = true;
-        m_collision_flag = false;
-        m_collsion_depth = 0;
-        m_border_bottom_last_connection_point = 90;
-        m_border_top_last_connection_point = 90;
         m_vecBorderMeshes.resize(4);
         m_shaking_rating = 0;
         m_border_shift = 0;
+
         m_game_over = false;
         m_enemy_spawn_state = false;
         m_is_running = false;
+
         m_current_wave = 1;
         m_current_enemy_count = 0;
         m_score = 0;
         m_best_score = 0;
+        m_coef = 1;
     }
 
     TGame::~TGame()
@@ -55,6 +58,18 @@ namespace game
         enemy_shape.addVertex(50, 0);
         enemy_shape.addVertex(50, 50);
         enemy_shape.addVertex(0, 50);
+
+        particle_shape.m_color = color{255, 0, 0, 100};
+        particle_shape.addVertex(0, 0);
+        particle_shape.addVertex(5, 0);
+        particle_shape.addVertex(5, 5);
+        particle_shape.addVertex(0, 5);
+
+        particle_shape_2.m_color = color{0, 255, 255, 100};
+        particle_shape_2.addVertex(0, 0);
+        particle_shape_2.addVertex(5, 0);
+        particle_shape_2.addVertex(5, 5);
+        particle_shape_2.addVertex(0, 5);
 
 //        SpawnPlayer();
 //        SpawnEnemies(3);
@@ -287,7 +302,8 @@ namespace game
                 }
             }
         }
-        m_shaking_rating = m_shaking_rating + 0.5;
+        //if(shooter_entity_id == 0)
+        //    m_shaking_rating = m_shaking_rating + 1;
     }
 
     void TGame::Input(bool* keys)
@@ -354,6 +370,7 @@ namespace game
         if(m_score > m_best_score)
             m_best_score = m_score;
         m_score = 0;
+        m_coef = 10;
     }
 
     void TGame::SpawnPlayer()
@@ -364,7 +381,22 @@ namespace game
     void TGame::SpawnEnemy(int for_random)
     {
         srand(GetTime() * for_random);
-        AddEntity(TGameEntity(ENEMY, "sprite_enemy_1", enemy_shape, vec2(m_window_width + 60 + rand() % 300, m_window_height / 2 + (rand() % 400 - 100)), vec2(10, 10), -1, 0));
+        int rand_ans = rand() % 3;
+        if(rand_ans == 0)
+        {
+            AddEntity(TGameEntity(ENEMY, "sprite_enemy_1", enemy_shape, vec2(m_window_width + 60 + rand() % 300, rand() % 400 + 250), vec2(10, 10), -1, 0));
+            return;
+        }
+        if(rand_ans == 1)
+        {
+            AddEntity(TGameEntity(ENEMY, "sprite_enemy_2", enemy_shape, vec2(m_window_width + 60 + rand() % 300, rand() % 400 + 250), vec2(10, 10), -1, 0));
+            return;
+        }
+        if(rand_ans == 2)
+        {
+            AddEntity(TGameEntity(ENEMY, "sprite_enemy_3", enemy_shape, vec2(m_window_width + 60 + rand() % 300, rand() % 400 + 250), vec2(10, 10), -1, 0));
+            return;
+        }
     }
 
     void TGame::SpawnEnemies(int ammount)
@@ -396,27 +428,22 @@ namespace game
                    m_vecEntities[i].m_task.m_current_duration >= m_vecEntities[i].m_task.m_maximum_duration)
                 {
                     srand(GetTime() * i);
+                    m_vecEntities[i].m_task.m_type = TASK_MOVE;
+                    m_vecEntities[i].m_task.m_maximum_duration = rand() % 100 + 10;
+                    m_vecEntities[i].m_task.m_current_duration = 0;
+                    m_vecEntities[i].m_task.m_ax = -(rand() % 15 + 1);
                     if(rand() % 2 == 1)
                     {
-                        m_vecEntities[i].m_task.m_type = TASK_MOVE;
-                        m_vecEntities[i].m_task.m_maximum_duration = rand() % 100 + 10;
-                        m_vecEntities[i].m_task.m_current_duration = 0;
-                        m_vecEntities[i].m_task.m_ax = -(rand() % 6 + 1);
-                        if(rand() % 2 == 1)
-                        {
-                            if(m_vecEntities[i].m_y < m_window_height - 200)
-                                m_vecEntities[i].m_task.m_ay = rand() % 6 + 1;
-                        }
-                        else
-                        {
-                            if(m_vecEntities[i].m_y > 300)
-                                m_vecEntities[i].m_task.m_ay = -(rand() % 6 + 1);
-                        }
+                        if(m_vecEntities[i].m_y <= m_window_height / 2)
+                            m_vecEntities[i].m_task.m_ay = rand() % 6 + 1;
+
+                        if(m_vecEntities[i].m_y > m_window_height / 2)
+                            m_vecEntities[i].m_task.m_ay = -(rand() % 6 + 1);
                     }
                     else
                     {
                         m_vecEntities[i].m_task.m_type = TASK_STAY;
-                        m_vecEntities[i].m_task.m_maximum_duration = rand() % 100 + 10;
+                        m_vecEntities[i].m_task.m_maximum_duration = rand() % 50 + 10;
                         m_vecEntities[i].m_task.m_current_duration = 0;
                         m_vecEntities[i].m_task.m_ax = 0;
                         m_vecEntities[i].m_task.m_ay = 0;
@@ -435,6 +462,10 @@ namespace game
                     {
                         m_vecEntities[i].m_velocity_x += m_vecEntities[i].m_task.m_ax;
                         m_vecEntities[i].m_velocity_y += m_vecEntities[i].m_task.m_ay;
+                        if(m_vecEntities[i].m_y > m_window_height - 250 || m_vecEntities[i].m_y < 250)
+                        {
+                            m_vecEntities[i].m_velocity_y = 0;
+                        }
                     }
 
                     if(m_vecEntities[i].m_task.m_type == TASK_STAY)
@@ -446,6 +477,27 @@ namespace game
                 m_current_enemy_count++;
             }
         }
+    }
+
+    void TGame::AddParticle(float x, float y, int for_random, int type)
+    {
+        srand(GetTime() * for_random);
+        particle temp_particle;
+        temp_particle.m_pos = vec2(x, y + (rand() % 10 - 10));
+        temp_particle.m_maximum_life_time = rand() % 20 + 10;
+        temp_particle.m_current_life_time = 1;
+        if(type != BULLET)
+        {
+            temp_particle.m_shape = particle_shape;
+            temp_particle.m_pos.a+=25;
+        }
+        else
+        {
+            temp_particle.m_shape = particle_shape_2;
+            temp_particle.m_pos.a-=25;
+        }
+
+        m_vecParticles.push_back(temp_particle);
     }
 
     void TGame::Start()
@@ -466,6 +518,11 @@ namespace game
         m_collsion_depth = 0;
         m_vecCollisions.clear();
         m_sleep_time++;
+
+        if(m_coef > 1)
+        {
+            m_coef -= 0.1;
+        }
 
         if(m_is_running)
         {
@@ -497,6 +554,17 @@ namespace game
                   )
                 {
                     m_vecEntities.erase(it);
+                    it--;
+                }
+            }
+
+            for(auto it = m_vecParticles.begin(); it != m_vecParticles.end(); it++)
+            {
+                it->m_current_life_time++;
+
+                if(it->m_current_life_time >= it->m_maximum_life_time)
+                {
+                    m_vecParticles.erase(it);
                     it--;
                 }
             }
@@ -582,13 +650,20 @@ namespace game
                         {
                             if(!m_vecEntities[it->eID_1].m_did_hit && m_vecEntities[it->eID_1].m_bullet_owner_id != it->eID_2)
                             {
-                                m_vecEntities[it->eID_2].m_current_life -= 3;
+//                                if(m_vecEntities[it->eID_2].m_type == ENEMY && m_vecEntities[it->eID_1].m_bullet_owner_id == PLAYER)
+//                                    m_vecEntities[it->eID_2].m_current_life -= 5;
+//                                if(m_vecEntities[it->eID_2].m_type == PLAYER && m_vecEntities[it->eID_1].m_bullet_owner_id == ENEMY)
+                                    m_vecEntities[it->eID_2].m_current_life -= 5;
                                 m_vecEntities[it->eID_1].m_did_hit = true;
                                 if(it->eID_2 != 0 && m_vecEntities[it->eID_1].m_bullet_owner_id == 0)
                                 {
                                     m_score += 3;
+                                    m_shaking_rating = m_shaking_rating + 1;
                                     if(m_vecEntities[it->eID_2].m_current_life <= 0)
+                                    {
                                         m_score += 10;
+                                        m_coef += 2;
+                                    }
                                 }
                             }
                         }
@@ -600,13 +675,20 @@ namespace game
                         {
                             if(!m_vecEntities[it->eID_2].m_did_hit && m_vecEntities[it->eID_2].m_bullet_owner_id != it->eID_1)
                             {
-                                m_vecEntities[it->eID_1].m_current_life -= 5;
+//                                if(m_vecEntities[it->eID_1].m_type == ENEMY && m_vecEntities[it->eID_2].m_bullet_owner_id == PLAYER)
+//                                    m_vecEntities[it->eID_1].m_current_life -= 5;
+//                                if(m_vecEntities[it->eID_1].m_type == PLAYER && m_vecEntities[it->eID_2].m_bullet_owner_id == ENEMY)
+                                    m_vecEntities[it->eID_1].m_current_life -= 5;
                                 m_vecEntities[it->eID_2].m_did_hit = true;
                                 if(it->eID_1 != 0 && m_vecEntities[it->eID_2].m_bullet_owner_id == 0)
                                 {
                                     m_score += 3;
+                                    m_shaking_rating = m_shaking_rating + 1;
                                     if(m_vecEntities[it->eID_1].m_current_life <= 0)
+                                    {
+                                        m_coef += 2;
                                         m_score += 10;
+                                    }
                                 }
                             }
                         }
@@ -628,6 +710,27 @@ namespace game
 
                 ent->m_x += ent->m_velocity_x * delta_time;
                 ent->m_y += ent->m_velocity_y * delta_time;
+
+                int num_p = 0;
+                if(ent->m_type == BULLET)
+                    num_p = 1;
+                if(ent->m_type == PLAYER)
+                    num_p = 5;
+
+                if(ent->m_type != ENEMY)
+                {
+                    float p_shift = ent->m_height / num_p;
+                    for(int i = 0; i < num_p; i++)
+                    {
+                        if(ent->m_type == BULLET)
+                        {
+                            if(ent->m_velocity_x > 0)
+                                AddParticle(ent->m_x + ent->m_width / 2, ent->m_y + 1, i, BULLET);
+                            else
+                                AddParticle(ent->m_x + ent->m_width / 2, ent->m_y + 1, i, ENEMY);
+                        }
+                    }
+                }
             }
         }
     }

@@ -37,10 +37,12 @@ float frameCounter      = 0.0;
 float frameTime         = 1.0/FPS_LIMIT;
 float deltaTime         = 1.0/150.0;
 
-int window_width        = 1280;
-int window_height       = 720;
+int window_width        = 1600;
+int window_height       = 900;
 int max_msaa_samples    = 0;
 const char* window_name = "OpenGLEngine";
+
+float logo_a;
 
 vec2 mouse_pos;
 
@@ -79,6 +81,7 @@ void ShowGUI()
 {
     std::cout << "GUI shown" << std::endl;
     guilib.m_visible = true;
+    logo_a = 0;
 }
 
 void GameplayRender()
@@ -153,7 +156,10 @@ void GameplayRender()
             ShowGUI();
         }
         if(!Game.m_game_over)
-            graphics::DrawTexture(vec2(0, 0), window_width, window_height, resmngr.m_game_textures["sprite_logo"], true, color{255, 255, 255, 100});
+        {
+            graphics::DrawTexture(vec2(0, 0), window_width, window_height, resmngr.m_game_textures["sprite_logo"], true, color{255, 255, 255, logo_a});
+            logo_a++;
+        }
     }
 }
 
@@ -182,7 +188,7 @@ void Render()
 
     one_more_buffer.Bind();
     graphics::Clear();
-    resmngr.m_post_processing_shader.Activate(window_width, window_height, GetTime() / 1000, true, 0.003);
+    resmngr.m_post_processing_shader.Activate(window_width, window_height, GetTime() / 1000, true, 0.003, Game.m_coef);
     graphics::DrawTexture(vec2(0, 0), window_width, window_height, fbo.m_texture_id, true);
     resmngr.m_post_processing_shader.Deactivate();
     one_more_buffer.Unbind();
@@ -201,11 +207,20 @@ void Render()
     graphics::ftDrawText("Score: " + to_string(Game.m_score), text_color, vec2(0, 30), 25, ftlib);
     if(Game.m_best_score != 0)
         graphics::ftDrawText("Best score: " + to_string(Game.m_best_score), text_color, vec2(0, 60), 25, ftlib);
+
+    if(Game.m_is_running)
+    {
+        for(auto it = Game.m_vecParticles.begin(); it != Game.m_vecParticles.end(); it++)
+        {
+            it->m_shape.m_color.a = 100 - (100 / it->m_maximum_life_time * it->m_current_life_time);
+            it->m_shape.Draw(it->m_pos.a, it->m_pos.b, FILLED);
+        }
+    }
     //graphics::ftDrawText("Fps: " + to_string(FPS), text_color, vec2(0, 10), 10, ftlib);
     //graphics::ftDrawText((Game.m_collision_flag?"collision: yes":"collision: no"), text_color, vec2(0, 21), 10, ftlib);
     //graphics::ftDrawText("Depth: " + to_string(Game.m_collsion_depth), text_color, vec2(0, 32), 10, ftlib);
     //graphics::ftDrawText("Mouse pos: (" + to_string(mouse_pos.a) + ";" + to_string(mouse_pos.b) + ")", text_color, vec2(0, 44), 10, ftlib);
-    //graphics::ftDrawText("Player pos: (" + to_string(Game.m_vecEntities[0].m_x) + ";" + to_string(Game.m_vecEntities[0].m_y) + ")", text_color, vec2(0, 55), 10, ftlib);
+    //graphics::ftDrawText("shaking " + to_string(Game.m_shaking_rating), text_color, vec2(0, 55), 10, ftlib);
     //graphics::ftDrawText("Enemy pos: (" + to_string(Game.m_vecEntities[1].m_x) + ";" + to_string(Game.m_vecEntities[1].m_y) + ")", text_color, vec2(0, 66), 10, ftlib);
     //graphics::ftDrawText("Entity count: " + to_string((int)Game.m_vecEntities.size()), text_color, vec2(0, 78), 10, ftlib);
     //graphics::ftDrawText("Entity[1] velocity_x: " + to_string((int)Game.m_vecEntities[1].m_velocity_x), text_color, vec2(0, 89), 10, ftlib);

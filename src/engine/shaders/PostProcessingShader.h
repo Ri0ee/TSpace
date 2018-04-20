@@ -17,7 +17,7 @@ class TPostProcessingShader
         virtual ~TPostProcessingShader();
 
         void Create(string directory, string file_name);
-        void Activate(float res1, float res2, float time, bool vignette, float doublerating);
+        void Activate(float res1, float res2, float time, bool vignette, float doublerating, float coef);
         void Deactivate();
 
     private:

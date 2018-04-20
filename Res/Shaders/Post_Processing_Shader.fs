@@ -12,14 +12,14 @@ void main(void)
 	float a;
 
 	if(pos.x > 1.0 - (doublerating * 2) || pos.x < doublerating * 2) 
-		{ col.r = texture2D(tex0, vec2(pos.x * coef, pos.y * coef)).x; } 
+		{ col.r = texture2D(tex0,vec2(pos.x, pos.y)).x; } 
 	else 
-		{ col.r = texture2D(tex0, vec2((pos.x + doublerating) * coef, pos.y * coef)).x; }
-
+		{ col.r = texture2D(tex0,vec2(pos.x+doublerating, pos.y)).x; }
+	
 	if(pos.x < doublerating * 2 || pos.x > 1.0 - (doublerating * 2)) 
-		{ col.b = texture2D(tex0, vec2(pos.x * coef, pos.y * coef)).z; } 
+		{ col.b = texture2D(tex0,vec2(pos.x, pos.y)).z; } 
 	else 
-		{ col.b = texture2D(tex0, vec2((pos.x - doublerating) * coef, pos.y * coef)).z; }
+		{ col.b = texture2D(tex0,vec2(pos.x-doublerating, pos.y)).z; }
 
 	col.g = texture2D(tex0,vec2(pos.x, pos.y)).y;
 	a = texture2D(tex0,vec2(pos.x, pos.y)).w;
@@ -36,6 +36,8 @@ void main(void)
 	//col *= 0.9+0.1*sin(7.0*time+pos.y*700.0);              
 
 	col *= 0.97+0.03*sin(210.0*time);
+
+	col *= coef;
 
 	gl_FragColor = vec4(col, a);
 }

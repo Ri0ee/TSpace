@@ -41,6 +41,15 @@ namespace game
             }
     };
 
+    struct particle
+    {
+        float m_current_life_time;
+        float m_maximum_life_time;
+        color m_color;
+        vec2 m_pos;
+        TPolygon m_shape;
+    };
+
     class TGame
     {
         public:
@@ -52,6 +61,7 @@ namespace game
             void Update(float delta_time);
             void Init(int window_width, int window_height);
             void AddEntity(TGameEntity entity);
+            void AddParticle(float x, float y, int for_random, int type);
             void Shoot(int shooter_entity_id, int direction, int ammount);
             void ClearCollisions();
             TPolygon GenerateBorderMesh(bool position_top);
@@ -72,6 +82,7 @@ namespace game
             vector<TGameEntity> m_vecEntities;
             vector<collision> m_vecCollisions;
             vector<TPolygon> m_vecBorderMeshes;
+            vector<particle> m_vecParticles;
 
             TPolygon m_test_poly;
 
@@ -103,5 +114,11 @@ namespace game
             TPolygon bullet_shape_2;
             TPolygon player_shape;
             TPolygon enemy_shape;
+            TPolygon particle_shape;
+            TPolygon particle_shape_2;
+
+            float m_player_particle_delay;
+
+            float m_coef;
     };
 }
